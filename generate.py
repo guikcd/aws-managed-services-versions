@@ -98,11 +98,11 @@ def version_table_row(service, version, engine=None):
 def msk_versions():
     # root url: https://docs.aws.amazon.com/msk/latest/developerguide/what-is-msk.html
     req = requests.get(VERSION_URL_DETAIL["kafka"])
-    # Apache Kafka version 1.1.1, 2.2.1, and 2.3.1.
+    # Apache Kafka version 1.1.1, 2.2.1, 2.3.1, or 2.4.1.
     version_text = re.findall("Apache Kafka version (.*)", req.text)
     versions = []
     for msk_version in version_text[0].split(', '):
-        versions.append(msk_version.replace("or ", ""))
+        versions.append(msk_version.replace("or ", "").replace(". ", ""))
     return test_versions(versions)
 
 def eks_versions():
