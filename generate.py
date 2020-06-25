@@ -7,7 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 
 GENERATION_DATE = datetime.datetime.now()
-VERSION = '0.1'
+VERSION = '0.2'
 
 ELASTICACHE_ENGINES = ['memcached', 'redis']
 

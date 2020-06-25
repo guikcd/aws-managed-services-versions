@@ -15,7 +15,14 @@ elasticsearch = boto3.client('es')
 write_json(elasticsearch.list_elasticsearch_versions(), "elasticsearch.json")
 
 rds = boto3.client('rds')
-write_json(rds.describe_db_engine_versions(), "rds.json")
+paginator = rds.get_paginator('describe_db_engine_versions')
+engines = []
+all_engines = {}
+for page in paginator.paginate():
+    for version in page['DBEngineVersions']:
+        engines.append(version)
+all_engines['DBEngineVersions'] = engines
+write_json(all_engines, "rds.json")
 
 elasticache = boto3.client('elasticache')
 write_json(elasticache.describe_cache_engine_versions(), "elasticache.json")
