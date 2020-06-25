@@ -11,10 +11,15 @@ Spec
   * AWS Lambda
   * Amazon MQ (ActiveMQ)
   * Amazon MSK (Kafka)
-* Generate a single index.html page (use bootstrap); you can search all fields, thaks to jQuery
+* Generate a single index.html page (use bootstrap); you can search all fields, thanks to jQuery
 
-How to launch
--------------
+Visualize on-line
+-----------------
+
+Live on: https://aws-versions.iroqwa.org/
+
+How to launch manually
+----------------------
 
 * Authenticate on an AWS account (only describe/list actions, AWS managed policy `ReadOnlyAccess` is OK)
 * Populate somes metadata from AWS managed services:
@@ -27,6 +32,6 @@ $ ./fetch_data.py
 * Generate the html page:
 
 ```
-python ./generate.py
+$ ./generate.py
 ```
 * Point your brower to `index.html`
