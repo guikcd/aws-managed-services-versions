@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 import json
 import re
+import datetime
 from jinja2 import Template
 import requests
 from bs4 import BeautifulSoup
+
+GENERATION_DATE = datetime.datetime.now()
+VERSION = '0.1'
 
 ELASTICACHE_ENGINES = ['memcached', 'redis']
 
@@ -173,7 +177,7 @@ for version in lambda_versions():
 
 with open('index.template.html') as html:
     tm = Template(html.read())
-output = tm.render(my_cels=versions)
+output = tm.render(my_cels=versions, date=GENERATION_DATE, version=VERSION)
 
 with open("index.html", 'w') as html:
     html.write(output)
