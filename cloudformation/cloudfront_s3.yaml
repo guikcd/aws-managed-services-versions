@@ -50,6 +50,7 @@ Resources:
     Type: 'AWS::CloudFront::Distribution'
     Properties:
       DistributionConfig:
+        Comment: aws-managed-services-versions
         CustomErrorResponses:
           - ErrorCode: 403 # not found
             ResponseCode: 404
