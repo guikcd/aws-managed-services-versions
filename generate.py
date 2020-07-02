@@ -41,6 +41,7 @@ VERSION_URL_DETAIL = {
     'sqlserver-se': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html',
     'sqlserver-web': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html',
     'mq': 'https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/broker-engine.html',
+    'cassandra': 'https://docs.aws.amazon.com/keyspaces/latest/devguide/keyspaces-vs-cassandra.html',
 }
 
 OUTPUT_BUCKET = os.getenv('OUTPUT_BUCKET')
@@ -183,6 +184,17 @@ def lambda_versions():
 
     return test_versions(versions)
 
+def cassandra_versions():
+    """
+    Cassandra
+    """
+    req = requests.get(VERSION_URL_DETAIL["cassandra"])
+    soup = BeautifulSoup(req.text, 'html.parser')
+    html_versions = soup.find("div", attrs={"id": "main-col-body"}).find("p")
+    versions = []
+    versions.append(re.findall(r"clients that are compatible with Apache Cassandra ([\d.]+).  Amazon Keyspaces supports", html_versions.text)[0])
+    return test_versions(versions)
+
 def test_versions(versions):
     """
     test versions veracity
@@ -246,6 +258,9 @@ def lambda_handler(event, context): # pylint: disable=too-many-locals,unused-arg
     for rds_version in rds_engines(data=all_engines):
         for version in engines_versions(engine=rds_version, data=all_engines):
             versions += version_table_row("Amazon Relational Database Service (RDS) " + rds_version, version, rds_version)
+
+    for version in cassandra_versions():
+        versions += version_table_row("Amazon Keyspaces (for Apache Cassandra)", version, "cassandra")
 
     for version in engines_versions(engine='memcached', data=elasticache.describe_cache_engine_versions()):
         versions += version_table_row("Amazon ElastiCache memcached", version, "memcached")
