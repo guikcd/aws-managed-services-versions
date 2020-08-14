@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
-rm -rf lambda lambda.zip
+rm -rf lambda lambda.zip && mkdir lambda
 cp generate.py index.template.html __init__.py lambda
-pip install --target ./lambda -r lambda/requirements.txt
+pip install --target ./lambda -r requirements.txt
 cd lambda
 zip -r ../lambda.zip .
 cd ..
