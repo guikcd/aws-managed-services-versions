@@ -211,7 +211,7 @@ def lambda_handler(event, context):
         InvalidationBatch={
             'Paths': {
                 "Quantity": 1,
-                'Items': [OUTPUT_FILE]
+                'Items': ["/{}".format(OUTPUT_FILE)]
             },
             'CallerReference': 'aws-managed-services-versions-invalidation-{}'.format(datetime.datetime.now().timestamp())
         }

@@ -87,6 +87,7 @@ Resources:
          - !Ref DomainName
         ViewerCertificate:
          AcmCertificateArn: !Ref AcmCertificateArn
+         MinimumProtocolVersion: 'TLSv1.2_2019'
          SslSupportMethod: sni-only
         PriceClass: 'PriceClass_All'
       Tags:
@@ -126,6 +127,20 @@ Resources:
                 Resource:
                   - !Sub 'arn:aws:s3:::${S3Bucket}/index.html'
                   - !Sub 'arn:aws:s3:::${S3Bucket}/index2.html'
+        - PolicyName: aws-managed-services-versions-cloudfront-invalidations
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudfront:ListDistributions
+                  - cloudfront:ListTagsForResource
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - cloudfront:CreateInvalidation
+                Resource:
+                  - !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
       Tags:
         - Key: project
           Value: aws-managed-services-versions
