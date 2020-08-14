@@ -1,9 +1,9 @@
 #!/bin/bash
 set -e
-rm -rf lambda.dist lambda.zip
-cp -a lambda lambda.dist
-pip install --target ./lambda.dist -r lambda.dist/requirements.txt
-cd lambda.dist
+rm -rf lambda lambda.zip
+cp generate.py index.template.html __init__.py lambda
+pip install --target ./lambda -r lambda/requirements.txt
+cd lambda
 zip -r ../lambda.zip .
 cd ..
 aws s3 cp lambda.zip s3://aws-managed-services-versions/
