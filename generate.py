@@ -274,7 +274,7 @@ def lambda_handler(event, context): # pylint: disable=too-many-locals,unused-arg
         versions += version_table_row("Amazon ElastiCache redis", version, "redis")
     for beanstalk in ['PHP ', 'Tomcat ', 'Multi-container Docker ', 'Ruby ', 'Python ', 'IIS ', 'Go ']:
         for version in elasticbeanstalk_versions(platform=beanstalk, data=elasticbeanstalk.list_available_solution_stacks()):
-            versions += "<tr><td>AWS Elastic Beanstalk " + beanstalk + "</td><td><a href='https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/platforms-support-policy.html'>" + version + "</a></td></tr>"
+            versions += "<tr><td>AWS Elastic Beanstalk " + beanstalk + "</td><td><a href='https://docs.aws.amazon.com/elasticbeanstalk/latest/platforms/platforms-supported.html'>" + version + "</a></td></tr>"
 
 
     for version in msk_versions(data=msk.list_kafka_versions()):
