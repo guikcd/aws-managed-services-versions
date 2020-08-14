@@ -1,6 +1,6 @@
 # thanks https://coletiv.com/blog/how-to-use-aws-cloud-formation-to-setup-the-infrastructure-for-a-static-website/
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Static website hosting with S3 and CloudFront'
+Description: 'Fetch AWS managed services versions and present them'
 
 Parameters:
   BucketName:
@@ -20,6 +20,9 @@ Resources:
       WebsiteConfiguration:
         ErrorDocument: 'index.html'
         IndexDocument: 'index.html'
+      Tags:
+        - Key: project
+          Value: aws-managed-services-versions
 
   # Configure the bucket as a CloudFront Origin
   ReadPolicy:
@@ -87,30 +90,102 @@ Resources:
          - !Ref DomainName
         ViewerCertificate:
          AcmCertificateArn: !Ref AcmCertificateArn
+         MinimumProtocolVersion: 'TLSv1.2_2019'
          SslSupportMethod: sni-only
         PriceClass: 'PriceClass_All'
       Tags:
         - Key: project
           Value: aws-managed-services-versions
 
-  # Create an IAM user with Access Keys to enable automated deployment of the website to this bucket
-  PublishUser:
-    Type: 'AWS::IAM::User'
+  FetchIAMRole:
+    Type: AWS::IAM::Role
     Properties:
+      RoleName: aws-managed-services-versions
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Path: /
       Policies:
-        - PolicyName: !Sub 'publish-to-${S3Bucket}'
+        - PolicyName: aws-managed-services-versions-fetch
           PolicyDocument:
+            Version: '2012-10-17'
             Statement:
-              - Action: 's3:*'
-                Effect: Allow
+              - Effect: Allow
+                Action:
+                  - rds:DescribeDBEngineVersions
+                  - elasticache:DescribeCacheEngineVersions
+                  - mq:DescribeBrokerEngineTypes
+                  - elasticbeanstalk:ListAvailableSolutionStacks
+                  - es:ListElasticsearchVersions
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
                 Resource:
-                  - !Sub 'arn:aws:s3:::${S3Bucket}'
-                  - !Sub 'arn:aws:s3:::${S3Bucket}/*'
-
-  PublishCredentials:
-    Type: 'AWS::IAM::AccessKey'
+                  - !Sub 'arn:aws:s3:::${S3Bucket}/index.html'
+                  - !Sub 'arn:aws:s3:::${S3Bucket}/index2.html'
+        - PolicyName: aws-managed-services-versions-cloudfront-invalidations
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudfront:ListDistributions
+                  - cloudfront:ListTagsForResource
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - cloudfront:CreateInvalidation
+                Resource:
+                  - !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
+      Tags:
+        - Key: project
+          Value: aws-managed-services-versions
+  Lambda:
+    Type: AWS::Lambda::Function
     Properties:
-      UserName: !Ref PublishUser
+      FunctionName: aws-managed-services-versions-fetch
+      Runtime: python3.7
+      Role: !GetAtt 'FetchIAMRole.Arn'
+      Handler: generate.lambda_handler
+      Code:
+        S3Bucket: aws-managed-services-versions
+        S3Key: lambda.zip
+      Environment:
+        Variables:
+          OUTPUT_BUCKET: !Sub '${S3Bucket}'
+          OUTPUT_FILE: index.html
+      Description: Lambda for fetching AWS versions
+      MemorySize: 128
+      Timeout: 60
+      ReservedConcurrentExecutions: 2
+      Tags:
+        - Key: project
+          Value: aws-managed-services-versions
+  ScheduleLambda:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Daily run of aws-managed-services-versions-fetch function
+      Name: aws-managed-services-versions-fetch-schedule
+      ScheduleExpression: "rate(1 day)"
+      State: "ENABLED"
+      Targets:
+        -
+          Arn: !GetAtt 'Lambda.Arn'
+          Id: "TargetFunctionV1"
+  PermissionForEventsToInvokeLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref Lambda
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt 'ScheduleLambda.Arn'
 
 Outputs:
   Bucket:
@@ -119,12 +194,6 @@ Outputs:
   BucketUrl:
     Description: 'S3 Bucket Url'
     Value: !GetAtt 'S3Bucket.WebsiteURL'
-  AccessKeyId:
-    Description: 'S3 Access Key'
-    Value: !Ref PublishCredentials
-  AccessKeySecret:
-    Description: 'S3 Secret Key'
-    Value: !GetAtt PublishCredentials.SecretAccessKey
   DistributionId:
     Description: 'CloudFront Distribution ID'
     Value: !Ref CloudFrontDistribution
