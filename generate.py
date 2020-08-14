@@ -41,6 +41,8 @@ VERSION_URL_DETAIL = {
     'sqlserver-se': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html',
     'sqlserver-web': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html',
     'mq': 'https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/broker-engine.html',
+    'opsworks-puppet': 'https://docs.aws.amazon.com/opsworks/latest/userguide/welcome_opspup.html',
+    'opsworks-chef': 'https://docs.aws.amazon.com/opsworks/latest/userguide/welcome_opscm.html',
 }
 
 OUTPUT_BUCKET = os.getenv('OUTPUT_BUCKET')
@@ -183,6 +185,36 @@ def lambda_versions():
 
     return test_versions(versions)
 
+def opsworks_puppet_versions():
+    req = requests.get(VERSION_URL_DETAIL["opsworks-puppet"])
+    soup = BeautifulSoup(req.text, 'html.parser')
+    result = soup.find_all("div", attrs={"id": "main-col-body"})
+    puppet_version = re.compile('Enterprise Master, version (.+)\.')
+    versions = []
+    versions.append(puppet_version.search(result[0].text).group(1))
+    return test_versions(versions)
+
+def opsworks_chef_versions():
+    req = requests.get(VERSION_URL_DETAIL["opsworks-chef"])
+    soup = BeautifulSoup(req.text, 'html.parser')
+    components = soup.find_all("table", attrs={"id": "w336ab1b9b9"})
+    output_rows = []
+    for component in components:
+        for table_row in component.findAll('tr'):
+            columns = table_row.findAll('td')
+            output_row = []
+            for column in columns:
+                # also known as Chef solo or server
+                print("column: " , column.text, " </end>")
+                if column.text == '  Chef Infra  ': # please, re
+                    print("fffffffffffffffounddddddddd")
+                    output_row.append(column.text)
+    versions = []
+    for element in output_rows:
+        versions.append(element)
+
+    return test_versions(versions)
+
 def test_versions(versions):
     """
     test versions veracity
@@ -264,6 +296,12 @@ def lambda_handler(event, context): # pylint: disable=too-many-locals,unused-arg
     for version in lambda_versions():
         versions += version_table_row("AWS Lambda Runtimes", version, "lambda")
 
+    for version in opsworks_puppet_versions():
+        versions += version_table_row("AWS OpsWorks for Puppet Enterprise", version, "opsworks-puppet")
+    
+    for version in opsworks_chef_versions():
+        versions += version_table_row("AWS OpsWorks for Chef Automate", version, "opsworks-chef")
+
     with open('index.template.html') as html:
         template = Template(html.read())
     output = template.render(my_cels=versions, date=GENERATION_DATE, version=VERSION)
@@ -272,6 +310,10 @@ def lambda_handler(event, context): # pylint: disable=too-many-locals,unused-arg
     s3client.put_object(Body=output, Bucket=OUTPUT_BUCKET, Key=OUTPUT_FILE, ContentType='text/html')
     logging.info("Successfully pushed to s3://%s/%s", OUTPUT_BUCKET, OUTPUT_FILE)
     cloudfront_invalidation()
+
+    with open('index.template.html') as html:
+        tm = Template(html.read())
+    output = tm.render(my_cels=versions, date=GENERATION_DATE, version=VERSION)
 
 if __name__ == "__main__":
     lambda_handler({'event': 1}, '')
