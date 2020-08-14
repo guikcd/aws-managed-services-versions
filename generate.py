@@ -24,7 +24,11 @@ VERSION_URL_DETAIL = {
     'kafka': 'https://docs.aws.amazon.com/msk/latest/developerguide/what-is-msk.html',
     'kubernetes': 'https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html',
     'lambda': 'https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html',
-    'postgresql': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html',
+    'postgres': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html',
+    'aurora-postgresql': 'https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraPostgreSQL.Updates.20180305.html',
+    'aurora': 'https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Updates.html',
+    'aurora-mysql': 'https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Updates.html',
+    'neptune': 'https://docs.aws.amazon.com/neptune/latest/userguide/engine-releases.html',
     'docdb': 'https://aws.amazon.com/documentdb/faqs/',
     'mariadb' : 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MariaDB.html',
     'mysql': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MySQL.html',
@@ -117,7 +121,7 @@ def version_table_row(service, version, engine=None):
     """
     url = '#'
     if engine is not None:
-        if VERSION_URL_DETAIL.get('engine') is not None:
+        if VERSION_URL_DETAIL.get(engine) is not None:
             url = VERSION_URL_DETAIL[engine]
     return "<tr>\n<td>{}</td>\n<td><a href='{}'>{}</a></td>\n</tr>\n".format(service, url, version)
 
