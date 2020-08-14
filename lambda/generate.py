@@ -194,7 +194,7 @@ def lambda_handler(event, context):
     output = tm.render(my_cels=versions, date=GENERATION_DATE, version=VERSION)
     
     s3 = boto3.client('s3')
-    response = s3.put_object(Body=output, Bucket=OUTPUT_BUCKET, Key=OUTPUT_FILE)
+    response = s3.put_object(Body=output, Bucket=OUTPUT_BUCKET, Key=OUTPUT_FILE, ContentType='text/html')
     logging.info("Successfully pushed to s3://{}/{}".format(OUTPUT_BUCKET, OUTPUT_FILE))
 
     cloudfront = boto3.client('cloudfront')

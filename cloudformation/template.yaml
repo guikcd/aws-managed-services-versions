@@ -20,6 +20,9 @@ Resources:
       WebsiteConfiguration:
         ErrorDocument: 'index.html'
         IndexDocument: 'index.html'
+      Tags:
+        - Key: project
+          Value: aws-managed-services-versions
 
   # Configure the bucket as a CloudFront Origin
   ReadPolicy:
@@ -157,7 +160,7 @@ Resources:
       Environment:
         Variables:
           OUTPUT_BUCKET: !Sub '${S3Bucket}'
-          OUTPUT_FILE: index2.html
+          OUTPUT_FILE: index.html
       Description: Lambda for fetching AWS versions
       MemorySize: 128
       Timeout: 60
