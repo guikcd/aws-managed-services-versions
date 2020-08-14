@@ -11,6 +11,7 @@ Spec
   * AWS Lambda
   * Amazon MQ (ActiveMQ)
   * Amazon MSK (Kafka)
+  * AWS OpsWorks (Puppet & Chef)
 * Generate a single index.html page (use bootstrap); you can search all fields, thanks to jQuery
 
 Visualize on-line
