@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-import json
-import boto3
 import re
+import os
 import datetime
+import boto3
 from jinja2 import Template
 import requests
 from bs4 import BeautifulSoup
 
 GENERATION_DATE = datetime.datetime.now()
-VERSION = '0.2'
+VERSION = '0.3'
 
 ELASTICACHE_ENGINES = ['memcached', 'redis']
 
@@ -33,6 +33,9 @@ VERSION_URL_DETAIL = {
     'sqlserver-web': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html',
     'mq': 'https://aws.amazon.com/amazon-mq/faqs/',
 }
+
+OUTPUT_BUCKET = os.getenv('OUTPUT_BUCKET')
+OUTPUT_FILE = os.getenv('OUTPUT_FILE')
 
 def rds_engines(data=None):
     all_engines = []
@@ -176,8 +179,9 @@ def lambda_handler(event, context):
         tm = Template(html.read())
     output = tm.render(my_cels=versions, date=GENERATION_DATE, version=VERSION)
     
-    with open("index.html", 'w') as html:
-        html.write(output)
+    s3 = boto3.client('s3')
+    response = s3.put_object(Body=output, Bucket=OUTPUT_BUCKET, Key=OUTPUT_FILE)
+    print(response)
 
 if __name__ == "__main__":
     lambda_handler({'event': 1}, '')
