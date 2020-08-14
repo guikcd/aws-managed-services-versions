@@ -2,6 +2,7 @@
 import re
 import os
 import datetime
+import logging
 import boto3
 from jinja2 import Template
 import requests
@@ -37,6 +38,12 @@ VERSION_URL_DETAIL = {
 OUTPUT_BUCKET = os.getenv('OUTPUT_BUCKET')
 OUTPUT_FILE = os.getenv('OUTPUT_FILE')
 
+# distribution to invalidate for frontend
+CLOUDFRONT_TAGS = {'Key': 'project', 'Value': 'aws-managed-services-versions'}
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 def rds_engines(data=None):
     all_engines = []
     if 'DBEngineVersions' in data:
@@ -46,9 +53,11 @@ def rds_engines(data=None):
     return(list(set(all_engines)))
 
 def elasticsearch_versions(data=None):
+    logging.info("Fetching ElasticSearch")
     return test_versions(data['ElasticsearchVersions'])
 
 def mq_versions(engine=None, data=None):
+    logging.info("Fetching MQ")
     versions = []
     for supported_engine in data['BrokerEngineTypes']:
        if supported_engine['EngineType'] == engine:
@@ -57,6 +66,7 @@ def mq_versions(engine=None, data=None):
     return test_versions(versions)
 
 def engines_versions(engine=None, data=None):
+    logging.info("Fetching RDS/Elasticache '{}'".format(engine))
     if engine in rds_engines(data=data):
         first_key = 'DBEngineVersions'
     if engine in ELASTICACHE_ENGINES:
@@ -74,6 +84,7 @@ def engines_versions(engine=None, data=None):
     return test_versions(versions)
 
 def elasticbeanstalk_versions(platform=None, data=None):
+    logging.info("Fetching ElasticBeanstalk '{}'".format(platform))
     versions = []
     for solution in data['SolutionStacks']:
        if platform in solution:
@@ -89,6 +100,7 @@ def version_table_row(service, version, engine=None):
     return "<tr>\n<td>{}</td>\n<td><a href='{}'>{}</a></td>\n</tr>\n".format(service, url, version)
 
 def msk_versions():
+    logging.info("Fetching MSK")
     # root url: https://docs.aws.amazon.com/msk/latest/developerguide/what-is-msk.html
     req = requests.get(VERSION_URL_DETAIL["kafka"])
     # Apache Kafka version 1.1.1, 2.2.1, 2.3.1, or 2.4.1.
@@ -99,6 +111,7 @@ def msk_versions():
     return test_versions(versions)
 
 def eks_versions():
+    logging.info("Fetching EKS")
     req = requests.get(VERSION_URL_DETAIL["kubernetes"])
     soup = BeautifulSoup(req.text, 'html.parser')
     # <div class="itemizedlist">
@@ -113,6 +126,7 @@ def eks_versions():
     return test_versions(versions)
 
 def lambda_versions(runtime=None):
+    logging.info("Fetching Lambda")
     req = requests.get(VERSION_URL_DETAIL["lambda"])
     soup = BeautifulSoup(req.text, 'html.parser')
     # <div class="itemizedlist">
@@ -139,6 +153,7 @@ def test_versions(versions):
     if len(versions) == 0:
         raise ValueError('versions list empty!')
     return versions
+
 
 def lambda_handler(event, context):
     elasticsearch = boto3.client('es')
@@ -181,7 +196,28 @@ def lambda_handler(event, context):
     
     s3 = boto3.client('s3')
     response = s3.put_object(Body=output, Bucket=OUTPUT_BUCKET, Key=OUTPUT_FILE)
-    print(response)
+    logging.info("Successfully pushed to s3://{}/{}".format(OUTPUT_BUCKET, OUTPUT_FILE))
+
+    cloudfront = boto3.client('cloudfront')
+    cloudfront_distributions = cloudfront.list_distributions()
+    distribution_invalidation_id = ""
+    # FIXME: if many distrubitions returned...
+    for distribution in cloudfront_distributions['DistributionList']['Items']:
+        tags = cloudfront.list_tags_for_resource(Resource=distribution['ARN'])
+        for tag in tags['Tags']['Items']:
+            if CLOUDFRONT_TAGS['Key'] == tag['Key'] and CLOUDFRONT_TAGS['Value'] == tag['Value']:
+                distribution_invalidation_id = distribution['Id']
+    response = cloudfront.create_invalidation(
+        DistributionId=distribution_invalidation_id,
+        InvalidationBatch={
+            'Paths': {
+                "Quantity": 1,
+                'Items': [OUTPUT_FILE]
+            },
+            'CallerReference': 'aws-managed-services-versions-invalidation-{}'.format(datetime.datetime.now().timestamp())
+        }
+    )
+    logging.info("CloudFront invalidation successfull")
 
 if __name__ == "__main__":
     lambda_handler({'event': 1}, '')
