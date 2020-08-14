@@ -190,11 +190,11 @@ def lambda_handler(event, context):
         versions += version_table_row("AWS Lambda Runtimes", version, "lambda")
     
     with open('index.template.html') as html:
-        tm = Template(html.read())
-    output = tm.render(my_cels=versions, date=GENERATION_DATE, version=VERSION)
+        template = Template(html.read())
+    output = template.render(my_cels=versions, date=GENERATION_DATE, version=VERSION)
     
     s3 = boto3.client('s3')
-    response = s3.put_object(Body=output, Bucket=OUTPUT_BUCKET, Key=OUTPUT_FILE, ContentType='text/html')
+    s3.put_object(Body=output, Bucket=OUTPUT_BUCKET, Key=OUTPUT_FILE, ContentType='text/html')
     logging.info("Successfully pushed to s3://{}/{}".format(OUTPUT_BUCKET, OUTPUT_FILE))
 
     cloudfront = boto3.client('cloudfront')
@@ -206,7 +206,7 @@ def lambda_handler(event, context):
         for tag in tags['Tags']['Items']:
             if CLOUDFRONT_TAGS['Key'] == tag['Key'] and CLOUDFRONT_TAGS['Value'] == tag['Value']:
                 distribution_invalidation_id = distribution['Id']
-    response = cloudfront.create_invalidation(
+    cloudfront.create_invalidation(
         DistributionId=distribution_invalidation_id,
         InvalidationBatch={
             'Paths': {
