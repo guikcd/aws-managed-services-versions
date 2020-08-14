@@ -154,7 +154,6 @@ def test_versions(versions):
         raise ValueError('versions list empty!')
     return versions
 
-
 def lambda_handler(event, context):
     elasticsearch = boto3.client('es')
     rds = boto3.client('rds')
