@@ -1,0 +1,7 @@
+{
+  "Paths": {
+    "Quantity": 1,
+    "Items": ["/index.html"]
+  },
+  "CallerReference": "my-invalidation-<id>"
+}
