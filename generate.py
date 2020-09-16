@@ -40,7 +40,7 @@ VERSION_URL_DETAIL = {
     'sqlserver-ex': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html',
     'sqlserver-se': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html',
     'sqlserver-web': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html',
-    'mq': 'https://aws.amazon.com/amazon-mq/faqs/',
+    'mq': 'https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/broker-engine.html',
 }
 
 OUTPUT_BUCKET = os.getenv('OUTPUT_BUCKET')
