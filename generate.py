@@ -273,6 +273,9 @@ def lightsail_versions(blueprint_type=None):
 
 
 def opsworks_puppet_versions():
+    """
+    OpsWorks Puppet
+    """
     req = requests.get(VERSION_URL_DETAIL["opsworks-puppet"])
     soup = BeautifulSoup(req.text, 'html.parser')
     result = soup.find_all("div", attrs={"id": "main-col-body"})
@@ -282,6 +285,9 @@ def opsworks_puppet_versions():
     return test_versions(versions)
 
 def opsworks_chef_versions():
+    """
+    OpsWorks Puppet
+    """
     req = requests.get(VERSION_URL_DETAIL["opsworks-chef"])
     soup = BeautifulSoup(req.text, 'html.parser')
     components = soup.find_all("table", attrs={"id": "w336ab1b9b9"})
