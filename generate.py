@@ -13,7 +13,7 @@ import requests
 from bs4 import BeautifulSoup
 
 GENERATION_DATE = datetime.datetime.now()
-VERSION = '0.3'
+VERSION = '0.4'
 
 ELASTICACHE_ENGINES = ['memcached', 'redis']
 
@@ -40,12 +40,13 @@ VERSION_URL_DETAIL = {
     'sqlserver-ex': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html',
     'sqlserver-se': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html',
     'sqlserver-web': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html',
-    'mq': 'https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/broker-engine.html',
+    'mq': 'https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/supported-engine-versions.html',
     'cassandra': 'https://docs.aws.amazon.com/keyspaces/latest/devguide/keyspaces-vs-cassandra.html',
 }
 
 OUTPUT_BUCKET = os.getenv('OUTPUT_BUCKET')
 OUTPUT_FILE = os.getenv('OUTPUT_FILE')
+LOCAL_DEBUG = os.getenv('LOCAL_DEBUG')
 
 # distribution to invalidate for frontend
 CLOUDFRONT_TAGS = {'Key': 'project', 'Value': 'aws-managed-services-versions'}
@@ -244,6 +245,8 @@ def lambda_handler(event, context): # pylint: disable=too-many-locals,unused-arg
 
     for version in mq_versions(engine="ACTIVEMQ", data=amazon_mq.describe_broker_engine_types()):
         versions += version_table_row("Amazon MQ for Apache ActiveMQ", version, "mq")
+    for version in mq_versions(engine="RABBITMQ", data=amazon_mq.describe_broker_engine_types()):
+        versions += version_table_row("Amazon MQ for RabbitMQ", version, "mq")
 
     for version in elasticsearch_versions(data=elasticsearch.list_elasticsearch_versions()):
         versions += version_table_row("Amazon ElasticSearch Service", version, "elasticsearch")
@@ -282,6 +285,10 @@ def lambda_handler(event, context): # pylint: disable=too-many-locals,unused-arg
     with open('index.template.html') as html:
         template = Template(html.read())
     output = template.render(my_cels=versions, date=GENERATION_DATE, version=VERSION)
+
+    if LOCAL_DEBUG == 'true':
+        with open(OUTPUT_FILE, 'w') as html_output:
+            write = html_output.write(output)
 
     s3client = boto3.client('s3')
     s3client.put_object(Body=output, Bucket=OUTPUT_BUCKET, Key=OUTPUT_FILE, ContentType='text/html')
