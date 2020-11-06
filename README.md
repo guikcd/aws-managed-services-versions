@@ -22,16 +22,10 @@ How to launch manually
 ----------------------
 
 * Authenticate on an AWS account (only describe/list actions, AWS managed policy `ReadOnlyAccess` is OK)
-* Populate somes metadata from AWS managed services:
-
-```
-$ ./fetch_data.py
-```
-
 * Install dependencies (virtualenv + requirements.txt)
 * Generate the html page:
 
 ```
-$ ./generate.py
+$ bash ./test_lambda.sh
 ```
-* Point your brower to `index.html`
+* Point your browser to `index2.html`
