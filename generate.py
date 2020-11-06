@@ -13,7 +13,7 @@ import requests
 from bs4 import BeautifulSoup
 
 GENERATION_DATE = datetime.datetime.now()
-VERSION = '0.3'
+VERSION = '0.4'
 
 ELASTICACHE_ENGINES = ['memcached', 'redis']
 
