@@ -1,4 +1,4 @@
-jinja2==2.10.1
+jinja2==2.11.3
 json2html==1.3.0
 beautifulsoup4==4.8.0
 requests==2.22.0
