@@ -13,7 +13,7 @@ import requests
 from bs4 import BeautifulSoup
 
 GENERATION_DATE = datetime.datetime.now()
-VERSION = '0.4'
+VERSION = '0.5'
 
 ELASTICACHE_ENGINES = ['memcached', 'redis']
 
@@ -127,19 +127,16 @@ def version_table_row(service, version, engine=None):
             url = VERSION_URL_DETAIL[engine]
     return "<tr>\n<td>{}</td>\n<td><a href='{}'>{}</a></td>\n</tr>\n".format(service, url, version)
 
-def msk_versions():
+def msk_versions(data=None):
     """
     MSK
     """
     logging.info("Fetching MSK")
-    # root url: https://docs.aws.amazon.com/msk/latest/developerguide/what-is-msk.html
-    req = requests.get(VERSION_URL_DETAIL["kafka"])
-    # Apache Kafka version 1.1.1, 2.2.1, 2.3.1, or 2.4.1.
-    version_text = re.findall("Apache Kafka version (.*)", req.text)
-    versions = []
-    for msk_version in version_text[0].split(', '):
-        versions.append(msk_version.replace("or ", "").replace(". ", ""))
-    return test_versions(versions)
+    active_versions = []
+    for version in data['KafkaVersions']:
+        if version['Status'] == 'ACTIVE':
+            active_versions.append(version['Version'])
+    return test_versions(active_versions)
 
 def eks_versions():
     """
@@ -240,6 +237,7 @@ def lambda_handler(event, context): # pylint: disable=too-many-locals,unused-arg
     elasticache = boto3.client('elasticache')
     elasticbeanstalk = boto3.client('elasticbeanstalk')
     amazon_mq = boto3.client('mq')
+    msk = boto3.client('kafka')
 
     versions = ""
 
@@ -274,7 +272,7 @@ def lambda_handler(event, context): # pylint: disable=too-many-locals,unused-arg
             versions += "<tr><td>AWS Elastic Beanstalk " + beanstalk + "</td><td><a href='https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/platforms-support-policy.html'>" + version + "</a></td></tr>"
 
 
-    for version in msk_versions():
+    for version in msk_versions(data=msk.list_kafka_versions()):
         versions += version_table_row("Amazon Managed Streaming for Apache Kafka (MSK)", version, 'kafka')
 
     for version in eks_versions():
