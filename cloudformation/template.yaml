@@ -123,6 +123,7 @@ Resources:
                   - mq:DescribeBrokerEngineTypes
                   - elasticbeanstalk:ListAvailableSolutionStacks
                   - es:ListElasticsearchVersions
+                  - kafka:ListKafkaVersions
                 Resource: '*'
               - Effect: Allow
                 Action:
