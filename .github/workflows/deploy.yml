@@ -27,6 +27,8 @@ jobs:
           mkdir lambda && cp generate.py index.template.html __init__.py lambda/ && pip install --target ./lambda -r requirements.txt && cd lambda && zip -r ../lambda.zip .
       - name: default deploy
         uses: appleboy/lambda-action@master
+        env:
+          AWS_REGION: eu-west-3
         with:
           zip_file: lambda.zip
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
