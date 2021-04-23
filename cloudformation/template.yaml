@@ -187,6 +187,32 @@ Resources:
       Action: "lambda:InvokeFunction"
       Principal: "events.amazonaws.com"
       SourceArn: !GetAtt 'ScheduleLambda.Arn'
+  GitHubDeploy:
+    Type: AWS::IAM::User
+    Properties:
+        Policies:
+          - PolicyName: aws-managed-services-s3-put-cloudformation-invalidate
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:PutObject
+                  Resource:
+                    - !Sub 'arn:aws:s3:::${S3Bucket}/index.html'
+                    - !Sub 'arn:aws:s3:::${S3Bucket}/index2.html'
+                - Effect: Allow
+                  Action:
+                    - cloudfront:CreateInvalidation
+                    - cloudfront:GetInvalidation
+                    - cloudfront:ListInvalidations
+                  Resource: '*'
+        Tags:
+          - Key: project
+            Value: aws-managed-services-versions
+          - Key: createdBy
+            Value: aws-managed-services-versions Cloudformation stack
+        UserName: github-deploy
 
 Outputs:
   Bucket:
