@@ -204,6 +204,7 @@ Resources:
                 - Effect: Allow
                   Action:
                     - lambda:UpdateFunctionCode
+                    - lambda:InvokeFunction
                   Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Lambda}'
         Tags:
           - Key: project
