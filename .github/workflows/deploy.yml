@@ -27,7 +27,7 @@ jobs:
           mkdir lambda && cp generate.py index.template.html __init__.py lambda/ && pip install --target ./lambda -r requirements.txt && cd lambda && zip -r ../lambda.zip . && ls -lh
 
       - name: put zip on S3
-        uses: zdurham/s3-upload-github-action@1.0.1
+        uses: zdurham/s3-upload-github-action@master
         env:
          FILE: ./lambda.zip
          AWS_REGION: ${{ secrets.AWS_REGION }}
