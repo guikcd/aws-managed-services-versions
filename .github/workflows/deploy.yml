@@ -1,8 +1,8 @@
 name: deploy to lambda
 on:
   push:
-    branches-ignore:                                                             
-      - 'master' 
+    branches-ignore:
+      - 'master'
 jobs:
 
   build:

@@ -1,0 +1,17 @@
+name: Trigger invocation
+
+on:
+  push:
+    branches: 
+      - 'master' 
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Invoke aws-managed-services-versions-fetch Lambda
+          uses: gagoar/invoke-aws-lambda@master
+          with:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            FunctionName: aws-managed-services-versions-fetch
