@@ -202,9 +202,9 @@ def test_versions(versions):
         raise ValueError('versions list empty!')
     return versions
 
-def cloudfront_invalidation():
+def cloudfront_invalidation(item=None):
     """
-    Invalidate CloudFront OUTPUT_FILE
+    Invalidate CloudFront item
     """
     cloudfront = boto3.client('cloudfront')
     cloudfront_distributions = cloudfront.list_distributions()
@@ -220,7 +220,7 @@ def cloudfront_invalidation():
         InvalidationBatch={
             'Paths': {
                 "Quantity": 1,
-                'Items': ["/{}".format(OUTPUT_FILE)]
+                'Items': ["/{}".format(item)]
             },
             'CallerReference': 'aws-managed-services-versions-invalidation-{}'.format(datetime.datetime.now().timestamp())
         }
@@ -296,7 +296,7 @@ def lambda_handler(event, context): # pylint: disable=too-many-locals,unused-arg
     s3client = boto3.client('s3')
     s3client.put_object(Body=output, Bucket=OUTPUT_BUCKET, Key=OUTPUT_FILE, ContentType='text/html')
     logging.info("Successfully pushed to s3://%s/%s", OUTPUT_BUCKET, OUTPUT_FILE)
-    cloudfront_invalidation()
+    cloudfront_invalidation(item=OUTPUT_FILE)
 
 if __name__ == "__main__":
     lambda_handler({'event': 1}, '')
