@@ -156,7 +156,7 @@ Resources:
       Role: !GetAtt 'FetchIAMRole.Arn'
       Handler: generate.lambda_handler
       Code:
-        S3Bucket: aws-managed-services-versions
+        S3Bucket: !Ref BucketName
         S3Key: lambda.zip
       Environment:
         Variables:
