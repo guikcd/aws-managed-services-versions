@@ -25,10 +25,18 @@ jobs:
       - name: Build zip
         run: |
           mkdir lambda && cp generate.py index.template.html __init__.py lambda/ && pip install --target ./lambda -r requirements.txt && cd lambda && zip -r ../lambda.zip .
+
+      - name: put zip on S3
+        uses: shallwefootball/s3-upload-action@master
+        with:
+          aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_bucket: ${{ secrets.AWS_BUCKET }}
+          source_dir: 'lambda.zip'
+
       - name: default deploy
         uses: appleboy/lambda-action@master
         with:
-          zip_file: lambda.zip
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: ${{ secrets.AWS_REGION }}
