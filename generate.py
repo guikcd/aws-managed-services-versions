@@ -232,6 +232,11 @@ def lambda_handler(event, context): # pylint: disable=too-many-locals,unused-arg
     """
     Lambda entry point
     """
+
+    if 'output_file' in event:
+        logging.info("Overriding OUTPUT_FILE env variable with '{}' value".format(event['output_file']))
+        OUTPUT_FILE = event['output_file']
+
     elasticsearch = boto3.client('es')
     rds = boto3.client('rds')
     elasticache = boto3.client('elasticache')

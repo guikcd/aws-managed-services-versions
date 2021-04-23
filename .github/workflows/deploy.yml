@@ -53,4 +53,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           REGION: ${{ secrets.AWS_REGION }}
           FunctionName: aws-managed-services-versions-fetch
-          Payload: '{ "outFile": "index2.html" }'
+          Payload: '{ "output_file": "index2.html" }'
