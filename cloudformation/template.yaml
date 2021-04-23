@@ -187,6 +187,31 @@ Resources:
       Action: "lambda:InvokeFunction"
       Principal: "events.amazonaws.com"
       SourceArn: !GetAtt 'ScheduleLambda.Arn'
+  GitHubDeploy:
+    Type: AWS::IAM::User
+    Properties:
+        Policies:
+          - PolicyName: aws-managed-services-s3-lambda-update
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:PutObject
+                    - s3:GetObject
+                  Resource:
+                    - !Sub 'arn:aws:s3:::${S3Bucket}/lambda.zip'
+                - Effect: Allow
+                  Action:
+                    - lambda:UpdateFunctionCode
+                    - lambda:InvokeFunction
+                  Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Lambda}'
+        Tags:
+          - Key: project
+            Value: aws-managed-services-versions
+          - Key: createdBy
+            Value: aws-managed-services-versions Cloudformation stack
+        UserName: github-deploy
 
 Outputs:
   Bucket:
