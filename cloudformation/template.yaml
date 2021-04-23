@@ -191,7 +191,7 @@ Resources:
     Type: AWS::IAM::User
     Properties:
         Policies:
-          - PolicyName: aws-managed-services-s3-put-cloudformation-invalidate
+          - PolicyName: aws-managed-services-s3-lambda-update
             PolicyDocument:
               Version: '2012-10-17'
               Statement:
@@ -201,12 +201,15 @@ Resources:
                   Resource:
                     - !Sub 'arn:aws:s3:::${S3Bucket}/index.html'
                     - !Sub 'arn:aws:s3:::${S3Bucket}/index2.html'
+                    - !Sub 'arn:aws:s3:::${S3Bucket}/lambda.zip'
                 - Effect: Allow
                   Action:
-                    - cloudfront:CreateInvalidation
-                    - cloudfront:GetInvalidation
-                    - cloudfront:ListInvalidations
+                    - iam:ListRoles
                   Resource: '*'
+                - Effect: Allow
+                  Action:
+                    - lambda:UpdateFunctionCode
+                  Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Lambda}'
         Tags:
           - Key: project
             Value: aws-managed-services-versions
