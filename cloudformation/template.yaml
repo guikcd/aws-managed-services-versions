@@ -198,14 +198,9 @@ Resources:
                 - Effect: Allow
                   Action:
                     - s3:PutObject
+                    - s3:GetObject
                   Resource:
-                    - !Sub 'arn:aws:s3:::${S3Bucket}/index.html'
-                    - !Sub 'arn:aws:s3:::${S3Bucket}/index2.html'
                     - !Sub 'arn:aws:s3:::${S3Bucket}/lambda.zip'
-                - Effect: Allow
-                  Action:
-                    - iam:ListRoles
-                  Resource: '*'
                 - Effect: Allow
                   Action:
                     - lambda:UpdateFunctionCode
