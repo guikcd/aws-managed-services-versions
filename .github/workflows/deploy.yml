@@ -24,7 +24,11 @@ jobs:
 
       - name: Build zip
         run: |
-          mkdir lambda && cp generate.py index.template.html __init__.py lambda/ && pip install --target ./lambda -r requirements.txt && cd lambda && zip -r ../lambda.zip .
+          mkdir lambda && cp generate.py index.template.html __init__.py lambda/ && pip install --target ./lambda -r requirements.txt && cd lambda && zip -r ../lambda.zip . && ls -lh
+
+      - name: Verify zip
+        run: |
+          ls -lh
 
       - name: put zip on S3
         uses: shallwefootball/s3-upload-action@master
