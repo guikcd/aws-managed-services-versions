@@ -45,7 +45,6 @@ VERSION_URL_DETAIL = {
 }
 
 OUTPUT_BUCKET = os.getenv('OUTPUT_BUCKET')
-OUTPUT_FILE = os.getenv('OUTPUT_FILE')
 LOCAL_DEBUG = os.getenv('LOCAL_DEBUG')
 
 # distribution to invalidate for frontend
@@ -233,9 +232,10 @@ def lambda_handler(event, context): # pylint: disable=too-many-locals,unused-arg
     Lambda entry point
     """
 
+    output_file = os.getenv('OUTPUT_FILE')
     if 'output_file' in event:
-        logging.info("Overriding OUTPUT_FILE env variable with '{}' value".format(event['output_file']))
-        OUTPUT_FILE = event['output_file']
+        logging.info("Overriding OUTPUT_FILE env variable with '%s' value", event['output_file'])
+        output_file = event['output_file']
 
     elasticsearch = boto3.client('es')
     rds = boto3.client('rds')
@@ -290,13 +290,13 @@ def lambda_handler(event, context): # pylint: disable=too-many-locals,unused-arg
     output = template.render(my_cels=versions, date=GENERATION_DATE, version=VERSION)
 
     if LOCAL_DEBUG == 'true':
-        with open(OUTPUT_FILE, 'w') as html_output:
-            write = html_output.write(output)
+        with open(output_file, 'w') as html_output:
+            html_output.write(output)
 
     s3client = boto3.client('s3')
-    s3client.put_object(Body=output, Bucket=OUTPUT_BUCKET, Key=OUTPUT_FILE, ContentType='text/html')
-    logging.info("Successfully pushed to s3://%s/%s", OUTPUT_BUCKET, OUTPUT_FILE)
-    cloudfront_invalidation(item=OUTPUT_FILE)
+    s3client.put_object(Body=output, Bucket=OUTPUT_BUCKET, Key=output_file, ContentType='text/html')
+    logging.info("Successfully pushed to s3://%s/%s", OUTPUT_BUCKET, output_file)
+    cloudfront_invalidation(item=output_file)
 
 if __name__ == "__main__":
     lambda_handler({'event': 1}, '')
