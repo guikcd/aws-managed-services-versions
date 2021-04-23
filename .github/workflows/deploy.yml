@@ -1,0 +1,37 @@
+name: deploy to lambda
+on:
+  push:
+    branches:    
+      - '!master/**'
+jobs:
+
+  build:
+    name: deploy lambda function
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7]
+
+    steps:
+      - name: checkout source code
+        uses: actions/checkout@v1
+
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Build zip
+        run: |
+          mkdir lambda && cp generate.py index.template.html __init__.py lambda/ && pip install --target ./lambda -r requirements.txt && cd lambda && zip -r ../lambda.zip .
+      - name: default deploy
+        uses: appleboy/lambda-action@master
+        with:
+          zip_file: lambda.zip
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: ${{ secrets.AWS_REGION }}
+          function_name: aws-managed-services-versions-fetch
+          s3_bucket: aws-managed-services-versions
+          s3_key: lambda.zip
