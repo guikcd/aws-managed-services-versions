@@ -3,7 +3,7 @@
 """
 Fetch AWS managed services versions and generate an html page
 """
-mport re
+import re
 import os
 import datetime
 import logging
