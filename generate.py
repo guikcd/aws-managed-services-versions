@@ -3,14 +3,15 @@
 """
 Fetch AWS managed services versions and generate an html page
 """
-import re
-import os
 import datetime
 import logging
+import os
+import re
+
 import boto3
-from jinja2 import Template
 import requests
 from bs4 import BeautifulSoup
+from jinja2 import Template
 
 GENERATION_DATE = datetime.datetime.now()
 VERSION = "0.5"
