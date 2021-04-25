@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # pylint: disable=line-too-long
 """
-Fetch AWS managed services versions and generate an html page
+Fetch AWS managed services versions and generate a full html page
 """
 import datetime
 import logging
