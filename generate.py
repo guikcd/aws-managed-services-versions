@@ -3,7 +3,7 @@
 """
 Fetch AWS managed services versions and generate an html page
 """
-import re
+mport re
 import os
 import datetime
 import logging
@@ -53,6 +53,28 @@ CLOUDFRONT_TAGS = {'Key': 'project', 'Value': 'aws-managed-services-versions'}
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+logging.info("Fetching ElasticBeanstalk solutions stacks")
+elasticbeanstalk = boto3.client('elasticbeanstalk')
+EBS_SOLUTIONS_STACKS = elasticbeanstalk.list_available_solution_stacks()['SolutionStacks']
+
+logging.info('Fetching MQ engine types')
+amazon_mq = boto3.client('mq')
+MQ_ENGINE_TYPES = amazon_mq.describe_broker_engine_types()['BrokerEngineTypes']
+
+logging.info('Fetching ElastiCache engine versions')
+elasticache = boto3.client('elasticache')
+ELASTICACHE_ENGINE_VERSIONS = elasticache.describe_cache_engine_versions()
+
+logging.info('Fetching RDS engine versions')
+rds = boto3.client('rds')
+paginator = rds.get_paginator('describe_db_engine_versions')
+engines = []
+ALL_ENGINES = {}
+for page in paginator.paginate():
+    for rds_engine_version in page['DBEngineVersions']:
+        engines.append(rds_engine_version)
+ALL_ENGINES['DBEngineVersions'] = engines
+
 def rds_engines(data=None):
     """
     RDS
@@ -64,23 +86,25 @@ def rds_engines(data=None):
 
     return list(set(all_engines))
 
-def elasticsearch_versions(data=None):
+def elasticsearch_versions():
     """
     ES
     """
     logging.info("Fetching ElasticSearch")
-    return test_versions(data['ElasticsearchVersions'])
+    elasticsearch = boto3.client('es')
+    return test_versions(elasticsearch.list_elasticsearch_versions()['ElasticsearchVersions'])
 
-def mq_versions(engine=None, data=None):
+def mq_versions(engine=None):
     """
     MQ
     """
-    logging.info("Fetching MQ")
+    logging.info('Fetching MQ %s', engine)
+
     versions = []
-    for supported_engine in data['BrokerEngineTypes']:
+    for supported_engine in MQ_ENGINE_TYPES:
         if supported_engine['EngineType'] == engine:
-            for version in supported_engine['EngineVersions']:
-                versions.append(version['Name'])
+            for mq_version in supported_engine['EngineVersions']:
+                versions.append(mq_version['Name'])
     return test_versions(versions)
 
 def engines_versions(engine=None, data=None):
@@ -104,13 +128,14 @@ def engines_versions(engine=None, data=None):
     versions.reverse()
     return test_versions(versions)
 
-def elasticbeanstalk_versions(platform=None, data=None):
+def elasticbeanstalk_versions(platform=None):
     """
     ElasticBeanstalk
     """
     logging.info("Fetching ElasticBeanstalk '%s'", platform)
     versions = []
-    for solution in data['SolutionStacks']:
+    #for solution in elasticbeanstalk_list_available_solutions_stacks():
+    for solution in EBS_SOLUTIONS_STACKS:
         if platform in solution:
             beanstalk_version = re.compile('running {}(.+)'.format(platform))
             versions.append(beanstalk_version.search(solution).group(1))
@@ -126,13 +151,14 @@ def version_table_row(service, version, engine=None):
             url = VERSION_URL_DETAIL[engine]
     return "<tr>\n<td>{}</td>\n<td><a href='{}'>{}</a></td>\n</tr>\n".format(service, url, version)
 
-def msk_versions(data=None):
+def msk_versions():
     """
     MSK
     """
     logging.info("Fetching MSK")
+    msk = boto3.client('kafka')
     active_versions = []
-    for version in data['KafkaVersions']:
+    for version in msk.list_kafka_versions()['KafkaVersions']:
         if version['Status'] == 'ACTIVE':
             active_versions.append(version['Version'])
     return test_versions(active_versions)
@@ -226,7 +252,6 @@ def cloudfront_invalidation(item=None):
     )
     logging.info("CloudFront invalidation successfull")
 
-
 def lambda_handler(event, context): # pylint: disable=too-many-locals,unused-argument,too-many-branches
     """
     Lambda entry point
@@ -237,47 +262,32 @@ def lambda_handler(event, context): # pylint: disable=too-many-locals,unused-arg
         logging.info("Overriding OUTPUT_FILE env variable with '%s' value", event['output_file'])
         output_file = event['output_file']
 
-    elasticsearch = boto3.client('es')
-    rds = boto3.client('rds')
-    elasticache = boto3.client('elasticache')
-    elasticbeanstalk = boto3.client('elasticbeanstalk')
-    amazon_mq = boto3.client('mq')
-    msk = boto3.client('kafka')
-
     versions = ""
 
-    for version in mq_versions(engine="ACTIVEMQ", data=amazon_mq.describe_broker_engine_types()):
+    for version in mq_versions(engine="ACTIVEMQ"):
         versions += version_table_row("Amazon MQ for Apache ActiveMQ", version, "mq")
-    for version in mq_versions(engine="RABBITMQ", data=amazon_mq.describe_broker_engine_types()):
+    for version in mq_versions(engine="RABBITMQ"):
         versions += version_table_row("Amazon MQ for RabbitMQ", version, "mq")
 
-    for version in elasticsearch_versions(data=elasticsearch.list_elasticsearch_versions()):
+    for version in elasticsearch_versions():
         versions += version_table_row("Amazon ElasticSearch Service", version, "elasticsearch")
 
-    paginator = rds.get_paginator('describe_db_engine_versions')
-    engines = []
-    all_engines = {}
-    for page in paginator.paginate():
-        for version in page['DBEngineVersions']:
-            engines.append(version)
-    all_engines['DBEngineVersions'] = engines
-    for rds_version in rds_engines(data=all_engines):
-        for version in engines_versions(engine=rds_version, data=all_engines):
+    for rds_version in rds_engines(data=ALL_ENGINES):
+        for version in engines_versions(engine=rds_version, data=ALL_ENGINES):
             versions += version_table_row("Amazon Relational Database Service (RDS) " + rds_version, version, rds_version)
 
     for version in cassandra_versions():
         versions += version_table_row("Amazon Keyspaces (for Apache Cassandra)", version, "cassandra")
 
-    for version in engines_versions(engine='memcached', data=elasticache.describe_cache_engine_versions()):
+    for version in engines_versions(engine='memcached', data=ELASTICACHE_ENGINE_VERSIONS):
         versions += version_table_row("Amazon ElastiCache memcached", version, "memcached")
-    for version in engines_versions(engine='redis', data=elasticache.describe_cache_engine_versions()):
+    for version in engines_versions(engine='redis', data=ELASTICACHE_ENGINE_VERSIONS):
         versions += version_table_row("Amazon ElastiCache redis", version, "redis")
     for beanstalk in ['PHP ', 'Tomcat ', 'Multi-container Docker ', 'Ruby ', 'Python ', 'IIS ', 'Go ', 'Node.js ']:
-        for version in elasticbeanstalk_versions(platform=beanstalk, data=elasticbeanstalk.list_available_solution_stacks()):
+        for version in elasticbeanstalk_versions(platform=beanstalk):
             versions += "<tr><td>AWS Elastic Beanstalk " + beanstalk + "</td><td><a href='https://docs.aws.amazon.com/elasticbeanstalk/latest/platforms/platforms-supported.html'>" + version + "</a></td></tr>"
 
-
-    for version in msk_versions(data=msk.list_kafka_versions()):
+    for version in msk_versions():
         versions += version_table_row("Amazon Managed Streaming for Apache Kafka (MSK)", version, 'kafka')
 
     for version in eks_versions():
