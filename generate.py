@@ -43,6 +43,8 @@ VERSION_URL_DETAIL = {
     "sqlserver-web": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html",
     "mq": "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/supported-engine-versions.html",
     "cassandra": "https://docs.aws.amazon.com/keyspaces/latest/devguide/keyspaces-vs-cassandra.html",
+    "lightsail_app": "https://lightsail.aws.amazon.com/ls/docs/en_us/articles/compare-options-choose-lightsail-instance-image",
+    "lightsail_database": "https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-choosing-a-database",
 }
 
 OUTPUT_BUCKET = os.getenv("OUTPUT_BUCKET")
@@ -244,6 +246,27 @@ def cassandra_versions():
     )
     return test_versions(versions)
 
+def lightsail_versions(blueprint_type=None):
+    """
+    Lightsail
+    """
+
+    versions = []
+    logging.info("Fetching Lightsail")
+    lightsail = boto3.client("lightsail")
+
+    if blueprint_type == "app":
+        blueprints = lightsail.get_blueprints()['blueprints']
+        for blueprint in blueprints:
+            if blueprint['type'] == blueprint_type:
+                 versions.append(blueprint['name'] + " " + blueprint['version'])
+
+    if blueprint_type == "database":
+        databases = lightsail.get_relational_database_blueprints()['blueprints']
+        for database in databases:
+            versions.append( database["engineVersionDescription"])
+
+    return test_versions(versions)
 
 def test_versions(versions):
     """
@@ -298,6 +321,12 @@ def lambda_handler(
         output_file = event["output_file"]
 
     versions = ""
+
+    for version in lightsail_versions(blueprint_type="app"):
+        versions += version_table_row("Amazon Lightsail blueprints", version, "lightsail_app")
+
+    for version in lightsail_versions(blueprint_type="database"):
+        versions += version_table_row("Amazon Lightsail databases", version, "lightsail_database")
 
     for version in mq_versions(engine="ACTIVEMQ"):
         versions += version_table_row("Amazon MQ for Apache ActiveMQ", version, "mq")
