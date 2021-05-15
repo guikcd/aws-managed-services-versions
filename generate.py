@@ -246,6 +246,7 @@ def cassandra_versions():
     )
     return test_versions(versions)
 
+
 def lightsail_versions(blueprint_type=None):
     """
     Lightsail
@@ -256,17 +257,18 @@ def lightsail_versions(blueprint_type=None):
     lightsail = boto3.client("lightsail")
 
     if blueprint_type == "app":
-        blueprints = lightsail.get_blueprints()['blueprints']
+        blueprints = lightsail.get_blueprints()["blueprints"]
         for blueprint in blueprints:
-            if blueprint['type'] == blueprint_type:
-                 versions.append(blueprint['name'] + " " + blueprint['version'])
+            if blueprint["type"] == blueprint_type:
+                versions.append(blueprint["name"] + " " + blueprint["version"])
 
     if blueprint_type == "database":
-        databases = lightsail.get_relational_database_blueprints()['blueprints']
+        databases = lightsail.get_relational_database_blueprints()["blueprints"]
         for database in databases:
-            versions.append( database["engineVersionDescription"])
+            versions.append(database["engineVersionDescription"])
 
     return test_versions(versions)
+
 
 def test_versions(versions):
     """
@@ -323,10 +325,14 @@ def lambda_handler(
     versions = ""
 
     for version in lightsail_versions(blueprint_type="app"):
-        versions += version_table_row("Amazon Lightsail blueprints", version, "lightsail_app")
+        versions += version_table_row(
+            "Amazon Lightsail blueprints", version, "lightsail_app"
+        )
 
     for version in lightsail_versions(blueprint_type="database"):
-        versions += version_table_row("Amazon Lightsail databases", version, "lightsail_database")
+        versions += version_table_row(
+            "Amazon Lightsail databases", version, "lightsail_database"
+        )
 
     for version in mq_versions(engine="ACTIVEMQ"):
         versions += version_table_row("Amazon MQ for Apache ActiveMQ", version, "mq")
