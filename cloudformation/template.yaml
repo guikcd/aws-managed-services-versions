@@ -124,6 +124,8 @@ Resources:
                   - elasticbeanstalk:ListAvailableSolutionStacks
                   - es:ListElasticsearchVersions
                   - kafka:ListKafkaVersions
+                  - lightsail:GetBlueprints
+                  - lightsail:GetRelationalDatabaseBlueprints
                 Resource: '*'
               - Effect: Allow
                 Action:
