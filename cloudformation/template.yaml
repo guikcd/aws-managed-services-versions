@@ -78,7 +78,7 @@ Resources:
           TargetOriginId: s3origin
           ViewerProtocolPolicy: 'redirect-to-https'
         # This DefaultRootObject configuration is not enough.
-        DefaultRootObject: '/index.html'
+        DefaultRootObject: 'index.html'
         Enabled: true
         HttpVersion: http2
         Origins:
