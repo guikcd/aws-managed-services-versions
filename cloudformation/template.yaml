@@ -33,7 +33,7 @@ Resources:
         Statement:
           - Action: 's3:GetObject'
             Effect: Allow
-            Resource: !Sub 'arn:aws:s3:::${S3Bucket}/*'
+            Resource: !Sub 'arn:${AWS::Partition}:s3:::${S3Bucket}/*'
             #Principal: '*'
             # In an ideal scenario the policy would only grant these rights to CloudFront,
             # we do not do it from scratch as many projects start without having a domain name specified
@@ -131,8 +131,8 @@ Resources:
                 Action:
                   - s3:PutObject
                 Resource:
-                  - !Sub 'arn:aws:s3:::${S3Bucket}/index.html'
-                  - !Sub 'arn:aws:s3:::${S3Bucket}/index2.html'
+                  - !Sub 'arn:${AWS::Partition}:s3:::${S3Bucket}/index.html'
+                  - !Sub 'arn:${AWS::Partition}:s3:::${S3Bucket}/index2.html'
         - PolicyName: aws-managed-services-versions-cloudfront-invalidations
           PolicyDocument:
             Version: '2012-10-17'
@@ -146,7 +146,7 @@ Resources:
                 Action:
                   - cloudfront:CreateInvalidation
                 Resource:
-                  - !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
+                  - !Sub 'arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
       Tags:
         - Key: project
           Value: aws-managed-services-versions
@@ -202,12 +202,12 @@ Resources:
                     - s3:PutObject
                     - s3:GetObject
                   Resource:
-                    - !Sub 'arn:aws:s3:::${S3Bucket}/lambda.zip'
+                    - !Sub 'arn:${AWS::Partition}:s3:::${S3Bucket}/lambda.zip'
                 - Effect: Allow
                   Action:
                     - lambda:UpdateFunctionCode
                     - lambda:InvokeFunction
-                  Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${Lambda}'
+                  Resource: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${Lambda}'
         Tags:
           - Key: project
             Value: aws-managed-services-versions
