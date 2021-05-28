@@ -436,7 +436,7 @@ def lambda_handler(
 
     for version in opsworks_puppet_versions():
         versions += version_table_row("AWS OpsWorks for Puppet Enterprise", version, "opsworks-puppet")
-    
+
     for version in opsworks_chef_versions():
         versions += version_table_row("AWS OpsWorks for Chef Automate", version, "opsworks-chef")
 
@@ -455,10 +455,6 @@ def lambda_handler(
     logging.info("Successfully pushed to s3://%s/%s", OUTPUT_BUCKET, output_file)
     cloudfront_invalidation(item=output_file)
 
-
-    with open('index.template.html') as html:
-        tm = Template(html.read())
-    output = tm.render(my_cels=versions, date=GENERATION_DATE, version=VERSION)
 
 if __name__ == "__main__":
     lambda_handler({"event": 1}, "")
