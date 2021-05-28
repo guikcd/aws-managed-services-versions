@@ -19,34 +19,34 @@ VERSION = "0.5"
 ELASTICACHE_ENGINES = ["memcached", "redis"]
 
 VERSION_URL_DETAIL = {
-    'elasticsearch': 'https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/what-is-amazon-elasticsearch-service.html#aes-choosing-version',
-    'redis': 'https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/supported-engine-versions.html',
-    'memcached': 'https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/supported-engine-versions.html',
-    'kafka': 'https://docs.aws.amazon.com/msk/latest/developerguide/what-is-msk.html',
-    'kubernetes': 'https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html',
-    'lambda': 'https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html',
-    'postgres': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html',
-    'aurora-postgresql': 'https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraPostgreSQL.Updates.20180305.html',
-    'aurora': 'https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Updates.html',
-    'aurora-mysql': 'https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Updates.html',
-    'neptune': 'https://docs.aws.amazon.com/neptune/latest/userguide/engine-releases.html',
-    'docdb': 'https://aws.amazon.com/documentdb/faqs/',
-    'mariadb' : 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MariaDB.html',
-    'mysql': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MySQL.html',
-    'oracle-ee': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Oracle.html',
-    'oracle-se': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Oracle.html',
-    'oracle-se1': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Oracle.html',
-    'oracle-se2': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Oracle.html',
-    'sqlserver-ee': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html',
-    'sqlserver-ex': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html',
-    'sqlserver-se': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html',
-    'sqlserver-web': 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html',
-    'mq': 'https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/broker-engine.html',
+    "elasticsearch": "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/what-is-amazon-elasticsearch-service.html#aes-choosing-version",
+    "redis": "https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/supported-engine-versions.html",
+    "memcached": "https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/supported-engine-versions.html",
+    "kafka": "https://docs.aws.amazon.com/msk/latest/developerguide/what-is-msk.html",
+    "kubernetes": "https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html",
+    "lambda": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html",
+    "postgres": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html",
+    "aurora-postgresql": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraPostgreSQL.Updates.20180305.html",
+    "aurora": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Updates.html",
+    "aurora-mysql": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Updates.html",
+    "neptune": "https://docs.aws.amazon.com/neptune/latest/userguide/engine-releases.html",
+    "docdb": "https://aws.amazon.com/documentdb/faqs/",
+    "mariadb": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MariaDB.html",
+    "mysql": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MySQL.html",
+    "oracle-ee": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Oracle.html",
+    "oracle-se": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Oracle.html",
+    "oracle-se1": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Oracle.html",
+    "oracle-se2": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Oracle.html",
+    "sqlserver-ee": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html",
+    "sqlserver-ex": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html",
+    "sqlserver-se": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html",
+    "sqlserver-web": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html",
+    "mq": "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/broker-engine.html",
     "cassandra": "https://docs.aws.amazon.com/keyspaces/latest/devguide/keyspaces-vs-cassandra.html",
     "lightsail_app": "https://lightsail.aws.amazon.com/ls/docs/en_us/articles/compare-options-choose-lightsail-instance-image",
     "lightsail_database": "https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-choosing-a-database",
-    'opsworks-puppet': 'https://docs.aws.amazon.com/opsworks/latest/userguide/welcome_opspup.html',
-    'opsworks-chef': 'https://docs.aws.amazon.com/opsworks/latest/userguide/welcome_opscm.html',
+    "opsworks-puppet": "https://docs.aws.amazon.com/opsworks/latest/userguide/welcome_opspup.html",
+    "opsworks-chef": "https://docs.aws.amazon.com/opsworks/latest/userguide/welcome_opscm.html",
 }
 
 OUTPUT_BUCKET = os.getenv("OUTPUT_BUCKET")
@@ -277,29 +277,30 @@ def opsworks_puppet_versions():
     OpsWorks Puppet
     """
     req = requests.get(VERSION_URL_DETAIL["opsworks-puppet"])
-    soup = BeautifulSoup(req.text, 'html.parser')
+    soup = BeautifulSoup(req.text, "html.parser")
     result = soup.find_all("div", attrs={"id": "main-col-body"})
-    puppet_version = re.compile('Enterprise Master, version (.+)\.')
+    puppet_version = re.compile("Enterprise Master, version (.+)\.")
     versions = []
     versions.append(puppet_version.search(result[0].text).group(1))
     return test_versions(versions)
+
 
 def opsworks_chef_versions():
     """
     OpsWorks Puppet
     """
     req = requests.get(VERSION_URL_DETAIL["opsworks-chef"])
-    soup = BeautifulSoup(req.text, 'html.parser')
+    soup = BeautifulSoup(req.text, "html.parser")
     components = soup.find_all("table", attrs={"id": "w336ab1b9b9"})
     output_rows = []
     for component in components:
-        for table_row in component.findAll('tr'):
-            columns = table_row.findAll('td')
+        for table_row in component.findAll("tr"):
+            columns = table_row.findAll("td")
             output_row = []
             for column in columns:
                 # also known as Chef solo or server
-                print("column: " , column.text, " </end>")
-                if column.text == '  Chef Infra  ': # please, re
+                print("column: ", column.text, " </end>")
+                if column.text == "  Chef Infra  ":  # please, re
                     print("fffffffffffffffounddddddddd")
                     output_row.append(column.text)
     versions = []
@@ -307,6 +308,7 @@ def opsworks_chef_versions():
         versions.append(element)
 
     return test_versions(versions)
+
 
 def test_versions(versions):
     """
@@ -435,12 +437,16 @@ def lambda_handler(
         versions += version_table_row("AWS Lambda Runtimes", version, "lambda")
 
     for version in opsworks_puppet_versions():
-        versions += version_table_row("AWS OpsWorks for Puppet Enterprise", version, "opsworks-puppet")
+        versions += version_table_row(
+            "AWS OpsWorks for Puppet Enterprise", version, "opsworks-puppet"
+        )
 
     for version in opsworks_chef_versions():
-        versions += version_table_row("AWS OpsWorks for Chef Automate", version, "opsworks-chef")
+        versions += version_table_row(
+            "AWS OpsWorks for Chef Automate", version, "opsworks-chef"
+        )
 
-    with open('index.template.html') as html:
+    with open("index.template.html") as html:
         template = Template(html.read())
     output = template.render(my_cels=versions, date=GENERATION_DATE, version=VERSION)
 
