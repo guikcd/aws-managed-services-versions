@@ -192,6 +192,7 @@ Resources:
         -
           Arn: !GetAtt 'Lambda.Arn'
           Id: "TargetFunctionV1"
+          Input: '{"description": "Daily run of aws-managed-services-versions-fetch"}'
   PermissionForEventsToInvokeLambda:
     Type: AWS::Lambda::Permission
     Properties:
