@@ -406,7 +406,11 @@ def lambda_handler(
 
     s3client = boto3.client("s3")
     s3client.put_object(
-        Body=output, Bucket=OUTPUT_BUCKET, Key=output_file, ContentType="text/html"
+        Body=output,
+        Bucket=OUTPUT_BUCKET,
+        Key=output_file,
+        ContentType="text/html",
+        StorageClass="STANDARD_IA",
     )
     logging.info("Successfully pushed to s3://%s/%s", OUTPUT_BUCKET, output_file)
     cloudfront_invalidation(item=output_file)
