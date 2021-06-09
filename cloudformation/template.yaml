@@ -10,6 +10,9 @@ Parameters:
     Type: String
   AcmCertificateArn:
     Type: String
+  NotificationEmail:
+    Type: String
+    Description: Email to notify if Lambda fail
 
 Resources:
   # Create the bucket to contain the website HTML
@@ -168,6 +171,8 @@ Resources:
       MemorySize: 128
       Timeout: 60
       ReservedConcurrentExecutions: 2
+      DeadLetterConfig:
+        TargetArn: !Sub "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:aws-managed-services-versions-failures"
       Tags:
         - Key: project
           Value: aws-managed-services-versions
@@ -214,6 +219,14 @@ Resources:
           - Key: createdBy
             Value: aws-managed-services-versions Cloudformation stack
         UserName: github-deploy
+
+  MySNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: aws-managed-services-versions-failures
+      Subscription:
+      - Endpoint: !Ref NotificationEmail
+        Protocol: email
 
 Outputs:
   Bucket:
