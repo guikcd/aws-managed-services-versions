@@ -41,7 +41,7 @@ VERSION_URL_DETAIL = {
     "sqlserver-ex": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html",
     "sqlserver-se": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html",
     "sqlserver-web": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html",
-    "mq": "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/broker-engine.html",
+    "mq": "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/supported-engine-versions.html",
     "cassandra": "https://docs.aws.amazon.com/keyspaces/latest/devguide/keyspaces-vs-cassandra.html",
     "lightsail_app": "https://lightsail.aws.amazon.com/ls/docs/en_us/articles/compare-options-choose-lightsail-instance-image",
     "lightsail_database": "https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-choosing-a-database",
@@ -363,6 +363,12 @@ def lambda_handler(
         output_file = event["output_file"]
 
     versions = ""
+
+
+    for version in opsworks_chef_versions():
+        versions += version_table_row(
+            "AWS OpsWorks for Chef Automate", version, "opsworks-chef"
+        )
 
     for version in lightsail_versions(blueprint_type="app"):
         versions += version_table_row(
