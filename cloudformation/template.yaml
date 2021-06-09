@@ -172,7 +172,7 @@ Resources:
       Timeout: 60
       ReservedConcurrentExecutions: 2
       DeadLetterConfig:
-        TargetArn: !Sub "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:aws-managed-services-versions-failures"
+        TargetArn: !Sub "arn:${AWS::Partition}:sns:${AWS::Region}:${AWS::AccountId}:aws-managed-services-versions-failures"
       Tags:
         - Key: project
           Value: aws-managed-services-versions
