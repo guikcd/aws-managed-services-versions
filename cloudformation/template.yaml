@@ -10,6 +10,9 @@ Parameters:
     Type: String
   AcmCertificateArn:
     Type: String
+  NotificationEmail:
+    Type: String
+    Description: Email to notify if Lambda fail
 
 Resources:
   # Create the bucket to contain the website HTML
@@ -133,6 +136,11 @@ Resources:
                 Resource:
                   - !Sub 'arn:${AWS::Partition}:s3:::${S3Bucket}/index.html'
                   - !Sub 'arn:${AWS::Partition}:s3:::${S3Bucket}/index2.html'
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:sns:${AWS::Region}:${AWS::AccountId}:aws-managed-services-versions-failures'
         - PolicyName: aws-managed-services-versions-cloudfront-invalidations
           PolicyDocument:
             Version: '2012-10-17'
@@ -168,6 +176,8 @@ Resources:
       MemorySize: 128
       Timeout: 60
       ReservedConcurrentExecutions: 2
+      DeadLetterConfig:
+        TargetArn: !Sub "arn:${AWS::Partition}:sns:${AWS::Region}:${AWS::AccountId}:aws-managed-services-versions-failures"
       Tags:
         - Key: project
           Value: aws-managed-services-versions
@@ -182,6 +192,7 @@ Resources:
         -
           Arn: !GetAtt 'Lambda.Arn'
           Id: "TargetFunctionV1"
+          Input: '{"description": "Daily run of aws-managed-services-versions-fetch"}'
   PermissionForEventsToInvokeLambda:
     Type: AWS::Lambda::Permission
     Properties:
@@ -214,6 +225,14 @@ Resources:
           - Key: createdBy
             Value: aws-managed-services-versions Cloudformation stack
         UserName: github-deploy
+
+  MySNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: aws-managed-services-versions-failures
+      Subscription:
+      - Endpoint: !Ref NotificationEmail
+        Protocol: email
 
 Outputs:
   Bucket:
