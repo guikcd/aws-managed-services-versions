@@ -3,6 +3,7 @@
 """
 Fetch AWS managed services versions and generate a full html page
 """
+typo
 import datetime
 import logging
 import os
