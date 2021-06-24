@@ -50,9 +50,3 @@ jobs:
           DEFAULT_BRANCH: master
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_PYTHON_FLAKE8: false
-
-      - name: Lint HTML
-        uses: docker://validator/validator:latest
-        with:
-          entrypoint: vnu
-          args: index.template.html
