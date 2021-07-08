@@ -233,6 +233,9 @@ Resources:
       Subscription:
       - Endpoint: !Ref NotificationEmail
         Protocol: email
+      Tags:
+        - Key: "project"
+          Value: "aws-managed-services-versions"
 
 Outputs:
   Bucket:
