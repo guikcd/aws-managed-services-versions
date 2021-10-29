@@ -200,9 +200,22 @@ Resources:
       Action: "lambda:InvokeFunction"
       Principal: "events.amazonaws.com"
       SourceArn: !GetAtt 'ScheduleLambda.Arn'
-  GitHubDeploy:
-    Type: AWS::IAM::User
+
+  GitHubDeployRole:
+    Type: AWS::IAM::Role
     Properties:
+        RoleName: github-deploy-aws-managed-services
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Federated: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com'
+              Action: sts:AssumeRoleWithWebIdentity
+              Condition:
+                StringLike:
+                  token.actions.githubusercontent.com:sub: repo:guikcd/aws-managed-services-versions:*
+        Path: /
         Policies:
           - PolicyName: aws-managed-services-s3-lambda-update
             PolicyDocument:
@@ -224,7 +237,6 @@ Resources:
             Value: aws-managed-services-versions
           - Key: createdBy
             Value: aws-managed-services-versions Cloudformation stack
-        UserName: github-deploy
 
   MySNSTopic:
     Type: AWS::SNS::Topic
@@ -250,3 +262,6 @@ Outputs:
   Domain:
     Description: 'Cloudfront Domain'
     Value: !GetAtt CloudFrontDistribution.DomainName
+  GitHubDeployRole:
+    Description: 'GitHub role arn to deploy'
+    Value: !GetAtt GitHubDeployRole.Arn
