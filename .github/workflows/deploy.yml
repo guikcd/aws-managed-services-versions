@@ -9,6 +9,10 @@ jobs:
     name: deploy lambda function
 
     runs-on: ubuntu-latest
+    # These permissions are needed to interact with GitHub's OIDC Token endpoint.
+    permissions:
+      id-token: write
+      contents: read
     strategy:
       matrix:
         python-version: [3.7]
@@ -24,33 +28,34 @@ jobs:
 
       - name: Build zip
         run: |
-          mkdir lambda && cp generate.py index.template.html __init__.py lambda/ && pip install --target ./lambda -r requirements.txt && cd lambda && zip -r ../lambda.zip . && ls -lh
+          mkdir lambda && \
+            cp generate.py index.template.html __init__.py lambda/ && \
+            pip install --target ./lambda -r requirements.txt && \
+            cd lambda && zip -r ../lambda.zip . && \
+            ls -lh
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@master
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: put zip on S3
-        uses: zdurham/s3-upload-github-action@master
-        env:
-         FILE: ./lambda.zip
-         AWS_REGION: ${{ secrets.AWS_REGION }}
-         S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-         S3_KEY: lambda.zip
-         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws s3 cp ./lambda.zip s3://${{ secrets.AWS_S3_BUCKET }}/
 
       - name: default deploy
-        uses: appleboy/lambda-action@v0.1.3
-        with:
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: ${{ secrets.AWS_REGION }}
-          function_name: aws-managed-services-versions-fetch
-          s3_bucket: ${{ secrets.AWS_S3_BUCKET }}
-          s3_key: lambda.zip
+        run: |
+          aws lambda update-function-code \
+            --function-name aws-managed-services-versions-fetch \
+            --s3-bucket ${{ secrets.AWS_S3_BUCKET }} \
+            --s3-key lambda.zip
 
       - name: Invoke Lambda
-        uses: gagoar/invoke-aws-lambda@v3.3.0
-        with:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          REGION: ${{ secrets.AWS_REGION }}
-          FunctionName: aws-managed-services-versions-fetch
-          Payload: '{ "output_file": "index2.html" }'
+        run: |
+          aws lambda invoke \
+            --cli-binary-format raw-in-base64-out \
+            --function-name aws-managed-services-versions-fetch \
+            --invocation-type Event \
+            --payload '{ "output_file": "index2.html" }' \
+            response.json
