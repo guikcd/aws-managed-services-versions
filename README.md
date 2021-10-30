@@ -5,12 +5,14 @@ Spec
   * Amazon Elasticsearch Service
   * Amazon RDS
   * Amazon DocumentDB (MongoDB)
-  * Amazon Elasticache
+  * Amazon ElastiCache
   * AWS Elastic Beanstalk
   * Amazon EKS
   * AWS Lambda
   * Amazon MQ (ActiveMQ)
   * Amazon MSK (Kafka)
+  * Amazon LightSail
+  * Amazon Keyspaces (pour Apache Cassandra)
 * Generate a single index.html page (use bootstrap); you can search all fields, thanks to jQuery
 
 Visualize on-line
