@@ -1,5 +1,8 @@
+aws-managed-services-versions
+=============================
+
 Spec
-====
+----
 
 * fetch datas from managed services:
   * Amazon Elasticsearch Service
@@ -16,12 +19,12 @@ Spec
 * Generate a single index.html page (use bootstrap); you can search all fields, thanks to jQuery
 
 Visualize on-line
-=================
+-----------------
 
-Live on: https://aws-versions.iroqwa.org/
+Live on: <https://aws-versions.iroqwa.org/>
 
 How to launch manually
-======================
+----------------------
 
 * Authenticate on an AWS account (only describe/list actions, AWS managed policy `ReadOnlyAccess` is OK)
 * Install dependencies (virtualenv + requirements.txt)
