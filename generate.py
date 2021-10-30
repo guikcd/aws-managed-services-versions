@@ -19,7 +19,7 @@ VERSION = "0.5"
 ELASTICACHE_ENGINES = ["memcached", "redis"]
 
 VERSION_URL_DETAIL = {
-    "elasticsearch": "https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/what-is-amazon-elasticsearch-service.html#aes-choosing-version",
+    "opensearch": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/what-is.html#aes-choosing-version",
     "redis": "https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/supported-engine-versions.html",
     "memcached": "https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/supported-engine-versions.html",
     "kafka": "https://docs.aws.amazon.com/msk/latest/developerguide/what-is-msk.html",
@@ -93,15 +93,13 @@ def rds_engines(data=None):
     return list(set(all_engines))
 
 
-def elasticsearch_versions():
+def opensearch_versions():
     """
     ES
     """
-    logging.info("Fetching ElasticSearch")
-    elasticsearch = boto3.client("es")
-    return test_versions(
-        elasticsearch.list_elasticsearch_versions()["ElasticsearchVersions"]
-    )
+    logging.info("Fetching OpenSearch")
+    opensearch = boto3.client("opensearch")
+    return test_versions(opensearch.list_versions()["Versions"])
 
 
 def mq_versions(engine=None):
@@ -339,9 +337,9 @@ def lambda_handler(
     for version in mq_versions(engine="RABBITMQ"):
         versions += version_table_row("Amazon MQ for RabbitMQ", version, "mq")
 
-    for version in elasticsearch_versions():
+    for version in opensearch_versions():
         versions += version_table_row(
-            "Amazon ElasticSearch Service", version, "elasticsearch"
+            "Amazon OpenSearch Service", version, "opensearch"
         )
 
     for rds_version in rds_engines(data=ALL_ENGINES):
