@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.12/css/dataTables.bootstrap.min.css" rel="stylesheet"/>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.11.3/datatables.min.css"/>
 <title>Amazon Managed Services versions v{{version}}</title>
 </head>
 
@@ -25,13 +25,29 @@
 <a href="https://github.com/guikcd/aws-managed-services-versions"><img border="0" alt="GitHub repo" src="https://github.githubassets.com/favicons/favicon.svg" width="32" height="32"></a>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.12/js/jquery.dataTables.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.12/js/dataTables.bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.11.3/datatables.min.js"></script>
 <script>
+jQuery.extend( jQuery.fn.dataTableExt.oSort, {
+    "version-pre": function ( d ) {
+       var a = d.split("."), res = "";
+       for(var i = 0; i < a.length; i++) {
+          res += ("0000000000" + a[i]).slice(-10);
+       }
+       return res;
+    },
+    "version-asc": function ( a, b ) {
+        return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+    },
+    "version-desc": function ( a, b ) {
+        return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+    }
+});
 $(document).ready(function() {
   $('#mytable').DataTable({
-   "order": [[ 1, "desc" ]]
+   "aoColumnDefs": [
+           { "aTargets": [1], "sType": 'version' }
+        ]
   });
 })
 </script>
