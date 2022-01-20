@@ -93,7 +93,7 @@ Resources:
          - !Ref DomainName
         ViewerCertificate:
          AcmCertificateArn: !Ref AcmCertificateArn
-         MinimumProtocolVersion: 'TLSv1.2_2019'
+         MinimumProtocolVersion: 'TLSv1.2_2021'
          SslSupportMethod: sni-only
         PriceClass: 'PriceClass_All'
       Tags:
