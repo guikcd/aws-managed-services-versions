@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 from jinja2 import Template
 
 GENERATION_DATE = datetime.datetime.now()
-VERSION = "0.6"
+VERSION = "0.7"
 
 ELASTICACHE_ENGINES = ["memcached", "redis"]
 
@@ -41,7 +41,8 @@ VERSION_URL_DETAIL = {
     "sqlserver-ex": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html",
     "sqlserver-se": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html",
     "sqlserver-web": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html",
-    "mq": "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/supported-engine-versions.html",
+    "activemq": "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/activemq-version-management.html",
+    "rabbitmq": "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/rabbitmq-version-management.html",
     "cassandra": "https://docs.aws.amazon.com/keyspaces/latest/devguide/keyspaces-vs-cassandra.html",
     "lightsail_app": "https://lightsail.aws.amazon.com/ls/docs/en_us/articles/compare-options-choose-lightsail-instance-image",
     "lightsail_database": "https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-choosing-a-database",
@@ -79,6 +80,22 @@ for page in paginator.paginate():
     for rds_engine_version in page["DBEngineVersions"]:
         engines.append(rds_engine_version)
 ALL_ENGINES["DBEngineVersions"] = engines
+
+
+def check_urls():
+    """
+    test that versions urls to service documentation has not changed
+    """
+    # want to get the service
+    for service, url in VERSION_URL_DETAIL.items():
+        response = requests.get(url, allow_redirects=False)
+        if response.status_code != 200:
+            logging.warning(
+                "Service %s URL return %s instead of 200 (%s)",
+                service,
+                response.status_code,
+                url,
+            )
 
 
 def rds_engines(data=None):
@@ -333,9 +350,11 @@ def lambda_handler(
         )
 
     for version in mq_versions(engine="ACTIVEMQ"):
-        versions += version_table_row("Amazon MQ for Apache ActiveMQ", version, "mq")
+        versions += version_table_row(
+            "Amazon MQ for Apache ActiveMQ", version, "activemq"
+        )
     for version in mq_versions(engine="RABBITMQ"):
-        versions += version_table_row("Amazon MQ for RabbitMQ", version, "mq")
+        versions += version_table_row("Amazon MQ for RabbitMQ", version, "rabbitmq")
 
     for version in opensearch_versions():
         versions += version_table_row(
@@ -415,4 +434,5 @@ def lambda_handler(
 
 
 if __name__ == "__main__":
+    check_urls()
     lambda_handler({"event": 1}, "")
