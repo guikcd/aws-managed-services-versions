@@ -1,7 +1,7 @@
-[![Actions Status](https://github.com/guikcd/aws-managed-services-versions/workflows/Deploy%20to%20live/badge.svg)](https://github.com/guikcd/aws-managed-services-versions/actions)
-
 aws-managed-services-versions
 =============================
+
+[![Actions Status](https://github.com/guikcd/aws-managed-services-versions/workflows/Deploy%20to%20live/badge.svg)](https://github.com/guikcd/aws-managed-services-versions/actions)
 
 Spec
 ----
@@ -30,7 +30,7 @@ How to launch manually
 
 * Authenticate on an AWS account (only describe/list actions, AWS managed policy `ReadOnlyAccess` is OK)
 * Install dependencies (virtualenv + requirements.txt)
-* Generate the html page:
+* Generate the HTML page:
 
 ```bash
 $ bash ./test_lambda.sh
