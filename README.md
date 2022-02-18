@@ -18,7 +18,7 @@ Spec
   * Amazon MSK (Kafka)
   * Amazon LightSail
   * Amazon Keyspaces (pour Apache Cassandra)
-* Generate a single index.html page (use bootstrap); you can search all fields, thanks to jQuery
+* Generate a single `index.html` page (use bootstrap); you can search all fields, thanks to jQuery
 
 Visualize on-line
 -----------------
