@@ -7,17 +7,17 @@ Spec
 ----
 
 * fetch datas from managed services:
-  * Amazon Elasticsearch Service
+  * Amazon OpenSearch Service
   * Amazon RDS
   * Amazon DocumentDB (MongoDB)
-  * Amazon ElastiCache
+  * Amazon ElastiCache (Redis & Memcached)
   * AWS Elastic Beanstalk
-  * Amazon EKS
+  * Amazon Elastic Kubernetes Service (EKS)
   * AWS Lambda
-  * Amazon MQ (ActiveMQ)
-  * Amazon MSK (Kafka)
-  * Amazon LightSail
-  * Amazon Keyspaces (pour Apache Cassandra)
+  * Amazon MQ (ActiveMQ & RabbitMQ)
+  * Amazon Managed Streaming for Apache Kafka (MSK)
+  * Amazon Lightsail
+  * Amazon Keyspaces (for Apache Cassandra)
 * Generate a single `index.html` page (use bootstrap); you can search all fields, thanks to jQuery
 
 Visualize on-line
