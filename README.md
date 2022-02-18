@@ -1,3 +1,5 @@
+[![Actions Status](https://github.com/guikcd/aws-managed-services-versions/workflows/Deploy%20to%20live/badge.svg)](https://github.com/guikcd/aws-managed-services-versions/actions)
+
 aws-managed-services-versions
 =============================
 
