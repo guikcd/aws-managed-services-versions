@@ -1,6 +1,8 @@
 aws-managed-services-versions
 =============================
 
+[![Actions Status](https://github.com/guikcd/aws-managed-services-versions/workflows/Deploy%20to%20live/badge.svg)](https://github.com/guikcd/aws-managed-services-versions/actions)
+
 Spec
 ----
 
@@ -16,7 +18,7 @@ Spec
   * Amazon MSK (Kafka)
   * Amazon LightSail
   * Amazon Keyspaces (pour Apache Cassandra)
-* Generate a single index.html page (use bootstrap); you can search all fields, thanks to jQuery
+* Generate a single `index.html` page (use bootstrap); you can search all fields, thanks to jQuery
 
 Visualize on-line
 -----------------
@@ -28,7 +30,7 @@ How to launch manually
 
 * Authenticate on an AWS account (only describe/list actions, AWS managed policy `ReadOnlyAccess` is OK)
 * Install dependencies (virtualenv + requirements.txt)
-* Generate the html page:
+* Generate the HTML page:
 
 ```bash
 $ bash ./test_lambda.sh

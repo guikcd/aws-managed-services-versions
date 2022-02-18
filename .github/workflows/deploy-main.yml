@@ -1,4 +1,4 @@
-name: Trigger invocation
+name: Deploy to live
 
 on:
   push:
