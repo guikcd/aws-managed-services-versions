@@ -1,0 +1,18 @@
+version: 2
+updates:
+
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "22:37"
+      timezone: "Europe/Paris"
+    assignees:
+      - "guikcd"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "guikcd"
