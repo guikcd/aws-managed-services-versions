@@ -4,15 +4,13 @@ updates:
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "daily"
-      time: "22:37"
-      timezone: "Europe/Paris"
+      interval: "monthly"
     assignees:
       - "guikcd"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "monthly"
     assignees:
       - "guikcd"
