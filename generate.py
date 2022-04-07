@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 from jinja2 import Template
 
 GENERATION_DATE = datetime.datetime.now()
-VERSION = "0.7"
+VERSION = "0.7.1"
 
 ELASTICACHE_ENGINES = ["memcached", "redis"]
 
@@ -22,7 +22,7 @@ VERSION_URL_DETAIL = {
     "opensearch": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/what-is.html#aes-choosing-version",
     "redis": "https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/supported-engine-versions.html",
     "memcached": "https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/supported-engine-versions.html",
-    "kafka": "https://docs.aws.amazon.com/msk/latest/developerguide/what-is-msk.html",
+    "kafka": "https://docs.aws.amazon.com/msk/latest/developerguide/kafka-versions.html",
     "kubernetes": "https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html",
     "lambda": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html",
     "postgres": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html",
@@ -192,6 +192,8 @@ def msk_versions():
     for version in msk.list_kafka_versions()["KafkaVersions"]:
         if version["Status"] == "ACTIVE":
             active_versions.append(version["Version"])
+    active_versions.sort()
+    active_versions.reverse()
     return test_versions(active_versions)
 
 
