@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 from jinja2 import Template
 
 GENERATION_DATE = datetime.datetime.now()
-VERSION = "0.7.1"
+VERSION = "0.7.2"
 
 ELASTICACHE_ENGINES = ["memcached", "redis"]
 
