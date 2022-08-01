@@ -387,7 +387,6 @@ def lambda_handler(
     for beanstalk in [
         "PHP ",
         "Tomcat ",
-        "Multi-container Docker ",
         "Ruby ",
         "Python ",
         "IIS ",
