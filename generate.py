@@ -207,7 +207,7 @@ def eks_versions():
     # <div class="itemizedlist">
     # <ul class="itemizedlist" type="disc">
     # <li class="listitem">
-    # <p>1.14.6</p>
+    # <p><code class="code">1.14.6</code></p>
     # </li>
     html_versions = (
         soup.find("div", attrs={"class": "itemizedlist"})
@@ -216,7 +216,7 @@ def eks_versions():
     )
     versions = []
     for eks_version in html_versions:
-        versions.append(eks_version.contents[1].contents[0])
+        versions.append(eks_version.contents[1].contents[0].get_text())
     return test_versions(versions)
 
 
