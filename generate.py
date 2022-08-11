@@ -21,7 +21,7 @@ ELASTICACHE_ENGINES = ["memcached", "redis"]
 VERSION_URL_DETAIL = {
     "opensearch": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/what-is.html#aes-choosing-version",
     "redis": "https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/supported-engine-versions.html",
-    "memcached": "https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/supported-engine-versions.html",
+    "memcached": "https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/supported-engine-versions-mc.html",
     "kafka": "https://docs.aws.amazon.com/msk/latest/developerguide/kafka-versions.html",
     "kubernetes": "https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html",
     "lambda": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html",
