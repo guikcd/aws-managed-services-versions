@@ -113,6 +113,7 @@ Resources:
             Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
       Path: /
       Policies:
         - PolicyName: aws-managed-services-versions-fetch
@@ -179,6 +180,8 @@ Resources:
       DeadLetterConfig:
         TargetArn: !Sub "arn:${AWS::Partition}:sns:${AWS::Region}:${AWS::AccountId}:aws-managed-services-versions-failures"
       Architectures: [arm64] # default: x86_64
+      TracingConfig:
+        Mode: Active
       Tags:
         - Key: project
           Value: aws-managed-services-versions
