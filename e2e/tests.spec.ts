@@ -4,7 +4,7 @@ test('test', async ({ page }) => {
 
   await page.goto('https://aws-versions.iroqwa.org/index2.html');
 
-  await expect(page).toHaveTitle(/Amazon Managed Services versions/);
+  await expect(page).toHaveTitle(/Amazon Managed Services versions error/);
 
   await page.getByLabel('Search:').fill('nonexistent');
 
