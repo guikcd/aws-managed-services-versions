@@ -4,9 +4,9 @@ test('test', async ({ page }) => {
 
   await page.goto('https://aws-versions.iroqwa.org/index2.html');
 
-  await expect(page).toHaveTitle(/Amazon Managed Services versions error/);
+  await expect(page).toHaveTitle(/Amazon Managed Services versions/);
 
-  await page.getByLabel('Search:').fill('nonexistent');
+  await expect(page.getByLabel('Search:').fill('nonexistent')).toBeTruthy();
 
   await page.getByRole('cell', { name: 'Amazon MQ for RabbitMQdzadza' });
 
