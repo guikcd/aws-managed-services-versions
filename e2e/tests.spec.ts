@@ -8,6 +8,6 @@ test('test', async ({ page }) => {
 
   await page.getByLabel('Search:').fill('nonexistent');
 
-  await page.getByRole('cell', { name: 'Amazon MQ for RabbitMQ' });
+  await page.getByRole('cell', { name: 'Amazon MQ for RabbitMQdzadza' });
 
 });
