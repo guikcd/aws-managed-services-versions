@@ -6,10 +6,7 @@ test('test', async ({ page }) => {
 
   await expect(page).toHaveTitle(/Amazon Managed Services versions/);
 
-  // TODO: remove?
-  await page.getByLabel('Search:').click();
-
-  await page.getByLabel('Search:').fill('raabbitmq');
+  await page.getByLabel('Search:').fill('nonexistent');
 
   await page.getByRole('cell', { name: 'Amazon MQ for RabbitMQ' });
 
