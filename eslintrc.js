@@ -4,4 +4,5 @@ module.exports = {
     ecmaVersion: 2020,
     sourceType: "module",
     project: './tsconfig.json', // The error starts here
-  },
+  }
+}
