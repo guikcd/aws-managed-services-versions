@@ -5,9 +5,7 @@ on:
       - 'main'
 jobs:
 
-  build:
-    name: deploy lambda function
-
+  build-deploy:
     runs-on: ubuntu-latest
     # These permissions are needed to interact with GitHub's OIDC Token endpoint.
     permissions:

@@ -6,7 +6,7 @@ on:
       - 'main'
 
 jobs:
-  build-and-deploy:
+  deploy-main:
     runs-on: ubuntu-latest
     # These permissions are needed to interact with GitHub's OIDC Token endpoint.
     permissions:
