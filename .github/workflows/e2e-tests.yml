@@ -1,9 +1,8 @@
 name: Playwright Tests
 on:
   push:
-    branches: [main, e2e_tests]
-  pull_request:
-    branches: [main, e2e_tests]
+    branches-ignore:
+      - 'main'
 jobs:
   test:
     name: tests
