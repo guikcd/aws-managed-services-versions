@@ -9,7 +9,6 @@ permissions:
 jobs:
   dependabot:
     runs-on: ubuntu-latest
-    needs: [deploy lambda function, tests]
     if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
       - name: Dependabot metadata
