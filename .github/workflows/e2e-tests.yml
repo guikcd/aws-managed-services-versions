@@ -6,6 +6,7 @@ on:
     branches: [main, e2e_tests]
 jobs:
   test:
+    name: tests
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
