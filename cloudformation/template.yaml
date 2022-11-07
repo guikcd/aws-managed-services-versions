@@ -37,19 +37,22 @@ Resources:
           - Action: 's3:GetObject'
             Effect: Allow
             Resource: !Sub 'arn:${AWS::Partition}:s3:::${S3Bucket}/*'
-            #Principal: '*'
-            # In an ideal scenario the policy would only grant these rights to CloudFront,
-            # we do not do it from scratch as many projects start without having a domain name specified
-            # and we want to test the code as soon as possible.
             Principal:
-              CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
+              Service: cloudfront.amazonaws.com
+            Condition:
+              StringEquals:
+                "AWS:SourceArn": !Sub 'arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
 
   # Configure Access to CloudFront
-  CloudFrontOriginAccessIdentity:
-    Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
+  CloudFrontOriginAccessControlConfig:
+    Type: AWS::CloudFront::OriginAccessControl
     Properties:
-      CloudFrontOriginAccessIdentityConfig:
-        Comment: !Ref S3Bucket
+      OriginAccessControlConfig:
+        Description: !Ref AWS::StackName
+        Name: !Sub 'OAC-${S3Bucket}'
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
 
   # Configure CloudFront
   CloudFrontDistribution:
@@ -88,7 +91,8 @@ Resources:
           - DomainName: !GetAtt 'S3Bucket.DomainName'
             Id: s3origin
             S3OriginConfig:
-              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}'
+              OriginAccessIdentity: ''
+            OriginAccessControlId: !Ref CloudFrontOriginAccessControlConfig
         Aliases:
          - !Ref DomainName
         ViewerCertificate:
