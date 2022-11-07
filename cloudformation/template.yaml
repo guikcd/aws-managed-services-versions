@@ -179,6 +179,7 @@ Resources:
       ReservedConcurrentExecutions: 2
       DeadLetterConfig:
         TargetArn: !Sub "arn:${AWS::Partition}:sns:${AWS::Region}:${AWS::AccountId}:aws-managed-services-versions-failures"
+      Architectures: [arm64] # default: x86_64
       TracingConfig:
         Mode: Active
       Tags:
