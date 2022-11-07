@@ -44,11 +44,15 @@ Resources:
                 "AWS:SourceArn": !Sub 'arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
 
   # Configure Access to CloudFront
-  CloudFrontOriginAccessIdentity:
-    Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
+  CloudFrontOriginAccessControlConfig:
+    Type: AWS::CloudFront::OriginAccessControl
     Properties:
-      CloudFrontOriginAccessIdentityConfig:
-        Comment: !Ref S3Bucket
+      OriginAccessControlConfig:
+        Description: !Ref AWS::StackName
+        Name: !Sub 'OAC-${S3Bucket}'
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
 
   # Configure CloudFront
   CloudFrontDistribution:
@@ -87,7 +91,8 @@ Resources:
           - DomainName: !GetAtt 'S3Bucket.DomainName'
             Id: s3origin
             S3OriginConfig:
-              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}'
+              OriginAccessIdentity: ''
+            OriginAccessControlId: !Ref CloudFrontOriginAccessControlConfig
         Aliases:
          - !Ref DomainName
         ViewerCertificate:
