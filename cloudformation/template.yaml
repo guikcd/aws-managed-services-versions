@@ -130,7 +130,7 @@ Resources:
                   - elasticache:DescribeCacheEngineVersions
                   - mq:DescribeBrokerEngineTypes
                   - elasticbeanstalk:ListAvailableSolutionStacks
-                  - es:ListElasticsearchVersions
+                  - es:ListVersions
                   - kafka:ListKafkaVersions
                   - lightsail:GetBlueprints
                   - lightsail:GetRelationalDatabaseBlueprints
