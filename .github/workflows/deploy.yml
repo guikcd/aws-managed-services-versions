@@ -5,9 +5,7 @@ on:
       - 'main'
 jobs:
 
-  build:
-    name: deploy lambda function
-
+  build-deploy:
     runs-on: ubuntu-latest
     # These permissions are needed to interact with GitHub's OIDC Token endpoint.
     permissions:
@@ -35,7 +33,7 @@ jobs:
             ls -lh
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1.7.0
+        uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: ${{secrets.AWS_ROLE_TO_ASSUME}}
           aws-region: ${{secrets.AWS_REGION}}
