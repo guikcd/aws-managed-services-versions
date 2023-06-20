@@ -19,6 +19,9 @@ jobs:
       - name: checkout source code
         uses: actions/checkout@v3
 
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+
       - name: Install Python
         uses: actions/setup-python@v4
         with:
@@ -31,6 +34,9 @@ jobs:
             pip install --target ./lambda -r requirements.txt && \
             cd lambda && zip -r ../lambda.zip . && \
             ls -lh
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
