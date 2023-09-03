@@ -167,7 +167,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: aws-managed-services-versions-fetch
-      Runtime: python3.9
+      Runtime: python3.11
       Role: !GetAtt 'FetchIAMRole.Arn'
       Handler: generate.lambda_handler
       Code:
