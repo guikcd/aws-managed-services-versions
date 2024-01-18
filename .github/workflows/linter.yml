@@ -50,3 +50,14 @@ jobs:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_PYTHON_FLAKE8: false
+
+      # https://awslabs.github.io/serverless-rules/cfn-lint/#github-actions
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+      - name: Install cfn-lint-serverless
+        # Install cfn-lint-serverless
+        run: pip install cfn-lint cfn-lint-serverless
+      - name: Lint CloudFormation template
+        run: cfn-lint cloudformation/template.yaml -a cfn_lint_serverless.rules
