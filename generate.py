@@ -197,7 +197,7 @@ def msk_versions():
     return test_versions(active_versions)
 
 
-def eks_versions():
+def eks_versions_html():
     """
     EKS
     """
@@ -217,6 +217,25 @@ def eks_versions():
     versions = []
     for eks_version in html_versions:
         versions.append(eks_version.contents[1].contents[0].get_text())
+    return test_versions(versions)
+
+
+def eks_versions():
+    """
+    EKS: addon vpc-cni is always compatible with all versions
+    """
+    logging.info("Fetching EKS")
+    eks = boto3.client("eks")
+    paginator = eks.get_paginator("describe_addon_versions")
+    response_iterator = paginator.paginate(addonName="vpc-cni")
+    versions = []
+    for page in response_iterator:
+        for addon in page["addons"]:
+            for addonVersion in addon["addonVersions"]:
+                versions.append(addonVersion["compatibilities"][0]["clusterVersion"])
+    versions = list(set(versions))
+    versions.sort()
+    versions.reverse()
     return test_versions(versions)
 
 
