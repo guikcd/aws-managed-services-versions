@@ -1,4 +1,3 @@
-# thanks https://coletiv.com/blog/how-to-use-aws-cloud-formation-to-setup-the-infrastructure-for-a-static-website/
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'Fetch AWS managed services versions and present them'
 
@@ -19,6 +18,7 @@ Resources:
   S3Bucket:
     Type: 'AWS::S3::Bucket'
     Properties:
+      #checkov:skip=CKV_AWS_21
       BucketName: !Ref BucketName
       WebsiteConfiguration:
         ErrorDocument: 'index.html'
@@ -94,11 +94,11 @@ Resources:
               OriginAccessIdentity: ''
             OriginAccessControlId: !Ref CloudFrontOriginAccessControlConfig
         Aliases:
-         - !Ref DomainName
+          - !Ref DomainName
         ViewerCertificate:
-         AcmCertificateArn: !Ref AcmCertificateArn
-         MinimumProtocolVersion: 'TLSv1.2_2021'
-         SslSupportMethod: sni-only
+          AcmCertificateArn: !Ref AcmCertificateArn
+          MinimumProtocolVersion: 'TLSv1.2_2021'
+          SslSupportMethod: sni-only
         PriceClass: 'PriceClass_All'
       Tags:
         - Key: project
@@ -141,11 +141,6 @@ Resources:
                 Resource:
                   - !Sub 'arn:${AWS::Partition}:s3:::${S3Bucket}/index.html'
                   - !Sub 'arn:${AWS::Partition}:s3:::${S3Bucket}/index2.html'
-              - Effect: Allow
-                Action:
-                  - sns:Publish
-                Resource:
-                  - !Sub 'arn:${AWS::Partition}:sns:${AWS::Region}:${AWS::AccountId}:aws-managed-services-versions-failures'
         - PolicyName: aws-managed-services-versions-cloudfront-invalidations
           PolicyDocument:
             Version: '2012-10-17'
@@ -160,6 +155,15 @@ Resources:
                   - cloudfront:CreateInvalidation
                 Resource:
                   - !Sub 'arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
+        - PolicyName: aws-managed-services-versions-error-sqs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:SendMessage
+                Resource:
+                  - !GetAtt 'SQSFailure.Arn'
       Tags:
         - Key: project
           Value: aws-managed-services-versions
@@ -189,6 +193,82 @@ Resources:
       Tags:
         - Key: project
           Value: aws-managed-services-versions
+
+  LambdaDestination:
+    Type: AWS::Lambda::EventInvokeConfig
+    Properties:
+      FunctionName: !Ref Lambda
+      MaximumEventAgeInSeconds: 60
+      MaximumRetryAttempts: 0
+      Qualifier: $LATEST
+      DestinationConfig:
+        OnFailure:
+          Destination: !Sub "arn:${AWS::Partition}:sqs:${AWS::Region}:${AWS::AccountId}:aws-managed-services-versions-failures"
+  SQSFailure:
+    Type: AWS::SQS::Queue
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      QueueName: aws-managed-services-versions-failures
+      MessageRetentionPeriod: 1209600 # 14 days
+
+  LambdaFailureNotifIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: aws-managed-services-versions-failure
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole
+      Path: /
+      Policies:
+        - PolicyName: aws-managed-services-versions-fetch-sns
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource:
+                  - !Ref MySNSTopic
+
+  LambdaFailureNotification:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: aws-managed-services-versions-fetch-failures
+      Runtime: python3.11
+      Role: !GetAtt 'LambdaFailureNotifIAMRole.Arn'
+      Handler: index.lambda_handler
+      Code:
+        S3Bucket: !Ref BucketName
+        S3Key: lambda-notif.zip
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref MySNSTopic
+          SNS_SUBJECT: "AWS managed services versions fetch failure"
+      Description: Lambda to notify if fetching AWS versions fail
+      MemorySize: 128
+      ReservedConcurrentExecutions: 2
+      Architectures: [arm64] # default: x86_64
+      TracingConfig:
+        Mode: Active
+      Tags:
+        - Key: project
+          Value: aws-managed-services-versions
+
+  LambdaFailureTrigger:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 1
+      Enabled: true
+      EventSourceArn: !GetAtt 'SQSFailure.Arn'
+      FunctionName: !GetAtt 'LambdaFailureNotification.Arn'
+
   ScheduleLambda:
     Type: AWS::Events::Rule
     Properties:
@@ -212,47 +292,50 @@ Resources:
   GitHubDeployRole:
     Type: AWS::IAM::Role
     Properties:
-        RoleName: github-deploy-aws-managed-services
-        AssumeRolePolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Principal:
-                Federated: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com'
-              Action: sts:AssumeRoleWithWebIdentity
-              Condition:
-                StringLike:
-                  token.actions.githubusercontent.com:sub: repo:guikcd/aws-managed-services-versions:*
-        Path: /
-        Policies:
-          - PolicyName: aws-managed-services-s3-lambda-update
-            PolicyDocument:
-              Version: '2012-10-17'
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - s3:PutObject
-                    - s3:GetObject
-                  Resource:
-                    - !Sub 'arn:${AWS::Partition}:s3:::${S3Bucket}/lambda.zip'
-                - Effect: Allow
-                  Action:
-                    - lambda:UpdateFunctionCode
-                    - lambda:InvokeFunction
-                  Resource: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${Lambda}'
-        Tags:
-          - Key: project
-            Value: aws-managed-services-versions
-          - Key: createdBy
-            Value: aws-managed-services-versions Cloudformation stack
+      RoleName: github-deploy-aws-managed-services
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com'
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringLike:
+                token.actions.githubusercontent.com:sub: repo:guikcd/aws-managed-services-versions:*
+      Path: /
+      Policies:
+        - PolicyName: aws-managed-services-s3-lambda-update
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:s3:::${S3Bucket}/lambda.zip'
+                  - !Sub 'arn:${AWS::Partition}:s3:::${S3Bucket}/lambda-notif.zip'
+              - Effect: Allow
+                Action:
+                  - lambda:UpdateFunctionCode
+                  - lambda:InvokeFunction
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${Lambda}'
+                  - !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:${LambdaFailureNotification}'
+      Tags:
+        - Key: project
+          Value: aws-managed-services-versions
+        - Key: createdBy
+          Value: aws-managed-services-versions Cloudformation stack
 
   MySNSTopic:
     Type: AWS::SNS::Topic
     Properties:
       TopicName: aws-managed-services-versions-failures
       Subscription:
-      - Endpoint: !Ref NotificationEmail
-        Protocol: email
+        - Endpoint: !Ref NotificationEmail
+          Protocol: email
       Tags:
         - Key: "project"
           Value: "aws-managed-services-versions"
