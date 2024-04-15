@@ -411,6 +411,7 @@ def lambda_handler(
         "IIS ",
         "Go ",
         "Node.js ",
+        ".NET ",
     ]:
         for version in elasticbeanstalk_versions(platform=beanstalk):
             versions += (
