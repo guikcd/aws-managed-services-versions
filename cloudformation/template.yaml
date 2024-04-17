@@ -134,6 +134,7 @@ Resources:
                   - kafka:ListKafkaVersions
                   - lightsail:GetBlueprints
                   - lightsail:GetRelationalDatabaseBlueprints
+                  - eks:DescribeAddonVersions
                 Resource: '*'
               - Effect: Allow
                 Action:
