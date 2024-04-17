@@ -31,6 +31,11 @@ jobs:
             pip install --target ./lambda -r requirements.txt && \
             cd lambda && zip -r ../lambda.zip . && \
             ls -lh
+          cd ..
+          mkdir lambda-notif && \
+            cp error_notification/index.py __init__.py lambda-notif/ && \
+            cd lambda-notif && zip -r ../lambda-notif.zip . && \
+            ls -lh
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -41,6 +46,7 @@ jobs:
       - name: put zip on S3
         run: |
           aws s3 cp ./lambda.zip s3://${{secrets.AWS_S3_BUCKET}}/
+          aws s3 cp ./lambda-notif.zip s3://${{secrets.AWS_S3_BUCKET}}/
 
       - name: default deploy
         run: |
@@ -48,6 +54,10 @@ jobs:
             --function-name aws-managed-services-versions-fetch \
             --s3-bucket ${{secrets.AWS_S3_BUCKET}} \
             --s3-key lambda.zip
+          aws lambda update-function-code \
+            --function-name aws-managed-services-versions-fetch-failures \
+            --s3-bucket ${{secrets.AWS_S3_BUCKET}} \
+            --s3-key lambda-notif.zip
 
       - name: Invoke Lambda
         run: |
