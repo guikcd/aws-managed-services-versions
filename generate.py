@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 from jinja2 import Template
 
 GENERATION_DATE = datetime.datetime.now()
-VERSION = "0.7.2"
+VERSION = "0.7.3"
 
 ELASTICACHE_ENGINES = ["memcached", "redis"]
 
@@ -43,9 +43,9 @@ VERSION_URL_DETAIL = {
     "sqlserver-web": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html",
     "activemq": "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/activemq-version-management.html",
     "rabbitmq": "https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/rabbitmq-version-management.html",
-    "cassandra": "https://docs.aws.amazon.com/keyspaces/latest/devguide/keyspaces-vs-cassandra.html",
-    "lightsail_app": "https://lightsail.aws.amazon.com/ls/docs/en_us/articles/compare-options-choose-lightsail-instance-image",
-    "lightsail_database": "https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-choosing-a-database",
+    "cassandra": "https://docs.aws.amazon.com/keyspaces/latest/devguide/accessing.html",
+    "lightsail_app": "https://docs.aws.amazon.com/lightsail/latest/userguide/compare-options-choose-lightsail-instance-image.html",
+    "lightsail_database": "https://docs.aws.amazon.com/lightsail/latest/userguide/amazon-lightsail-choosing-a-database.html",
 }
 
 OUTPUT_BUCKET = os.getenv("OUTPUT_BUCKET")
@@ -197,7 +197,7 @@ def msk_versions():
     return test_versions(active_versions)
 
 
-def eks_versions():
+def eks_versions_html():
     """
     EKS
     """
@@ -217,6 +217,25 @@ def eks_versions():
     versions = []
     for eks_version in html_versions:
         versions.append(eks_version.contents[1].contents[0].get_text())
+    return test_versions(versions)
+
+
+def eks_versions():
+    """
+    EKS: addon vpc-cni is always compatible with all versions
+    """
+    logging.info("Fetching EKS")
+    eks = boto3.client("eks")
+    paginator = eks.get_paginator("describe_addon_versions")
+    response_iterator = paginator.paginate(addonName="vpc-cni")
+    versions = []
+    for page in response_iterator:
+        for addon in page["addons"]:
+            for addonVersion in addon["addonVersions"]:
+                versions.append(addonVersion["compatibilities"][0]["clusterVersion"])
+    versions = list(set(versions))
+    versions.sort()
+    versions.reverse()
     return test_versions(versions)
 
 
@@ -257,7 +276,7 @@ def cassandra_versions():
     versions = []
     versions.append(
         re.findall(
-            r"clients that are compatible with Apache Cassandra ([\d.]+).  Amazon Keyspaces supports",
+            r"clients that are compatible with Apache Cassandra ([\d.]+).",
             html_versions.text,
         )[0]
     )
@@ -392,6 +411,7 @@ def lambda_handler(
         "IIS ",
         "Go ",
         "Node.js ",
+        ".NET ",
     ]:
         for version in elasticbeanstalk_versions(platform=beanstalk):
             versions += (
