@@ -83,6 +83,7 @@ Resources:
           MinTTL: 60 # in seconds
           TargetOriginId: s3origin
           ViewerProtocolPolicy: 'redirect-to-https'
+          ResponseHeadersPolicyId: !Ref HeadersPolicy
         # This DefaultRootObject configuration is not enough.
         DefaultRootObject: 'index.html'
         Enabled: true
@@ -103,6 +104,32 @@ Resources:
       Tags:
         - Key: project
           Value: aws-managed-services-versions
+  HeadersPolicy:
+    Type: AWS::CloudFront::ResponseHeadersPolicy
+    Properties:
+      ResponseHeadersPolicyConfig:
+        Name: HSTS
+        SecurityHeadersConfig:
+          ContentSecurityPolicy:
+            ContentSecurityPolicy: default-src 'none'; img-src 'self' https://github.githubassets.com/; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com/ https://cdn.datatables.net/; style-src 'self' https://cdn.jsdelivr.net/ https://cdn.datatables.net/; object-src 'none'; frame-ancestors 'none'
+            Override: false
+          StrictTransportSecurity:
+            AccessControlMaxAgeSec: 63072000
+            Override: false
+          XSSProtection:
+            ModeBlock: true
+            Protection: true
+            Override: false
+          ContentTypeOptions:
+            Override: true
+          ReferrerPolicy:
+            Override: true
+            ReferrerPolicy: origin
+        CustomHeadersConfig:
+          Items:
+            - Header: Permissions-Policy
+              Override: true
+              Value: 'self'
 
   FetchIAMRole:
     Type: AWS::IAM::Role
