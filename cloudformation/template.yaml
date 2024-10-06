@@ -111,7 +111,8 @@ Resources:
         Name: HSTS
         SecurityHeadersConfig:
           ContentSecurityPolicy:
-            ContentSecurityPolicy: default-src 'none'; img-src 'self' https://github.githubassets.com/; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com/ https://cdn.datatables.net/; style-src 'self' https://cdn.jsdelivr.net/ https://cdn.datatables.net/; object-src 'none'; frame-ancestors 'none'
+            ContentSecurityPolicy: |-
+               default-src 'none'; img-src 'self' https://github.githubassets.com/ data:; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com/ https://cdn.datatables.net/; style-src 'self' https://cdn.jsdelivr.net/ https://cdn.datatables.net/; object-src 'none'; frame-ancestors 'none';
             Override: false
           StrictTransportSecurity:
             AccessControlMaxAgeSec: 63072000
@@ -125,11 +126,11 @@ Resources:
           ReferrerPolicy:
             Override: true
             ReferrerPolicy: origin
-        CustomHeadersConfig:
-          Items:
-            - Header: Permissions-Policy
-              Override: true
-              Value: 'self'
+        #CustomHeadersConfig:
+        #  Items:
+        #    - Header: Permissions-Policy
+        #      Override: true
+        #      Value: self
 
   FetchIAMRole:
     Type: AWS::IAM::Role
