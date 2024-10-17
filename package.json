@@ -2,6 +2,6 @@
   "name": "aws-managed-services-versions",
   "version": "1.0.0",
   "devDependencies": {
-    "@playwright/test": "^1.48.0"
+    "@playwright/test": "^1.48.1"
   }
 }
