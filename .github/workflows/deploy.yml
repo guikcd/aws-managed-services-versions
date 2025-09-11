@@ -17,10 +17,10 @@ jobs:
 
     steps:
       - name: checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{matrix.python-version}}
 
@@ -38,7 +38,7 @@ jobs:
             ls -lh
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{secrets.AWS_ROLE_TO_ASSUME}}
           aws-region: ${{secrets.AWS_REGION}}
