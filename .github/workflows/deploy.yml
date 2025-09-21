@@ -6,7 +6,7 @@ on:
 jobs:
 
   build-deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     # These permissions are needed to interact with GitHub's OIDC Token endpoint.
     permissions:
       id-token: write
