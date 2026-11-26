@@ -222,18 +222,16 @@ def eks_versions_html():
 
 def eks_versions():
     """
-    EKS: addon vpc-cni is always compatible with all versions
+    EKS: fetch available Kubernetes versions using describe_kubernetes_versions API
     """
     logging.info("Fetching EKS")
     eks = boto3.client("eks")
-    paginator = eks.get_paginator("describe_addon_versions")
-    response_iterator = paginator.paginate(addonName="vpc-cni")
+    paginator = eks.get_paginator("describe_kubernetes_versions")
+    response_iterator = paginator.paginate()
     versions = []
     for page in response_iterator:
-        for addon in page["addons"]:
-            for addonVersion in addon["addonVersions"]:
-                versions.append(addonVersion["compatibilities"][0]["clusterVersion"])
-    versions = list(set(versions))
+        for version_info in page["kubernetesVersions"]:
+            versions.append(version_info["kubernetesVersion"])
     versions.sort()
     versions.reverse()
     return test_versions(versions)
